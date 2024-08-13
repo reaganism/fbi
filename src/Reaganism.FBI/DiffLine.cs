@@ -5,6 +5,9 @@ namespace Reaganism.FBI;
 /// <summary>
 ///     Represents a line diff.
 /// </summary>
+/// <remarks>
+///     The string content should be accessed through <see cref="ToString"/>.
+/// </remarks>
 public readonly record struct DiffLine
 {
     /// <summary>
@@ -12,21 +15,23 @@ public readonly record struct DiffLine
     /// </summary>
     public Operation Operation { get; }
 
-    /*/// <summary>
-    ///     The text of this diff; that is, the actual line (not including the
-    ///     operation prefix).
-    /// </summary>
-    public string Text { get; }*/
-
-    // PERF: Cache original line concatenation here to avoid extra allocations.
     private readonly string line;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="DiffLine"/> struct.
+    /// </summary>
+    /// <param name="operation">The operation.</param>
+    /// <param name="text">The text <b>without</b> an operation prefix.</param>
     public DiffLine(Operation operation, string text)
     {
         Operation = operation;
         line      = operation.LinePrefix + text;
     }
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="DiffLine"/> struct.
+    /// </summary>
+    /// <param name="line">The line <b>with</b> an operation prefix.</param>
     public DiffLine(string line)
     {
         Operation = line[0] switch
@@ -39,6 +44,9 @@ public readonly record struct DiffLine
         this.line = line;
     }
 
+    /// <summary>
+    ///     The text content of this diff line.
+    /// </summary>
     public override string ToString()
     {
         return line;
