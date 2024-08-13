@@ -14,9 +14,18 @@ public readonly record struct LineRange(int Start, int End)
 {
     public int Length => End - Start;
 
+    public int First => Start;
+
+    public int Last => End - 1;
+
     public LineRange WithLength(int length)
     {
         return this with { End = Start + length };
+    }
+
+    public LineRange WithLast(int last)
+    {
+        return this with { End = last + 1 };
     }
 
     public bool Contains(int index)
