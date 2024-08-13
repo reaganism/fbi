@@ -121,14 +121,14 @@ public sealed class Patcher
 
         public void LinesToIds(TokenMapper tokenMapper)
         {
-            LmContext = tokenMapper.LinesToIds(Patch.ContextLines.Select(x => x.Text));
-            LmContext = tokenMapper.LinesToIds(Patch.PatchedLines.Select(x => x.Text));
+            LmContext = tokenMapper.LinesToIds(Patch.ContextLines);
+            LmContext = tokenMapper.LinesToIds(Patch.PatchedLines);
         }
 
         public void WordsToIds(TokenMapper tokenMapper)
         {
-            WmContext = Patch.ContextLines.Select(x => tokenMapper.WordsToIds(x.Text)).ToArray();
-            WmPatched = Patch.PatchedLines.Select(x => tokenMapper.WordsToIds(x.Text)).ToArray();
+            WmContext = Patch.ContextLines.Select(tokenMapper.WordsToIds).ToArray();
+            WmPatched = Patch.PatchedLines.Select(tokenMapper.WordsToIds).ToArray();
         }
     }
 
@@ -301,7 +301,7 @@ public sealed class Patcher
 
     private ReadOnlyPatch ApplyExactAt(int loc, WorkingPatch patch)
     {
-        if (!patch.Patch.ContextLines.Select(x => x.Text).SequenceEqual(lines.GetRange(loc, patch.Patch.Range1.Length)))
+        if (!patch.Patch.ContextLines.SequenceEqual(lines.GetRange(loc, patch.Patch.Range1.Length)))
         {
             // TODO: bro what
             throw new Exception("Patch engine failure.");
@@ -313,7 +313,7 @@ public sealed class Patcher
         }
 
         lines.RemoveRange(loc, patch.Patch.Range1.Length);
-        lines.InsertRange(loc, patch.Patch.PatchedLines.Select(x => x.Text));
+        lines.InsertRange(loc, patch.Patch.PatchedLines);
 
         // Update `lineModeText`.
         if (lmText is not null)
@@ -383,7 +383,7 @@ public sealed class Patcher
             return false;
         }
 
-        if (!patch.Patch.ContextLines.Select(x => x.Text).SequenceEqual(lines.GetRange(loc, patch.Patch.Range1.Length)))
+        if (!patch.Patch.ContextLines.SequenceEqual(lines.GetRange(loc, patch.Patch.Range1.Length)))
         {
             return false;
         }
