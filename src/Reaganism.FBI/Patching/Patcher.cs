@@ -520,15 +520,8 @@ public sealed class Patcher
 
     private static ReadOnlyPatch AdjustPatchToMatchedLines(ReadOnlyPatch patch, int[] match, IReadOnlyList<string> lines)
     {
-        var fuzzyPatch = new Patch
-        {
-            Diffs   = [..patch.Diffs],
-            Start1  = patch.Range1.Start,
-            Start2  = patch.Range2.Start,
-            Length1 = patch.Range1.Length,
-            Length2 = patch.Range2.Length,
-        };
-        var diffs = fuzzyPatch.Diffs;
+        var fuzzyPatch = patch.CreateMutable();
+        var diffs      = fuzzyPatch.Diffs;
 
         // Keep operations but replace lines with lines in source text.
         // Unmatched patch lines (-1) are deleted, unmatched target lines

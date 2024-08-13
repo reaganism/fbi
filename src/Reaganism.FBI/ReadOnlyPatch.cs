@@ -78,4 +78,16 @@ public readonly struct ReadOnlyPatch
         TrimmedRange1 = Patch.TrimRange(Range1, patch.Diffs);
         TrimmedRange2 = Patch.TrimRange(Range2, patch.Diffs);
     }
+
+    public Patch CreateMutable()
+    {
+        return new Patch
+        {
+            Diffs   = [..Diffs],
+            Start1  = Range1.Start,
+            Start2  = Range2.Start,
+            Length1 = Range1.Length,
+            Length2 = Range2.Length,
+        };
+    }
 }
