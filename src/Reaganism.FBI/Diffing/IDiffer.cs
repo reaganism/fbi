@@ -20,7 +20,7 @@ public static class DifferExtensions
         return LineMatching.MakeDiffList(@this.Match(originalLines, modifiedLines), originalLines, modifiedLines);
     }
 
-    public static IEnumerable<Patch> MakePatches(
+    public static IEnumerable<ReadOnlyPatch> MakePatches(
         this IDiffer          @this,
         IReadOnlyList<string> originalLines,
         IReadOnlyList<string> modifiedLines,

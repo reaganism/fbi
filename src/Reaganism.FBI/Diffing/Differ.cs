@@ -23,13 +23,13 @@ public static class Differ
                 File.ReadAllLines(Path.Combine(rootDir ?? "", modifiedPath)),
                 contextLinesCount,
                 collate
-            ).Select(x => x.AsReadOnly()).ToList(),
+            ).ToList(),
             originalPath,
             modifiedPath
         );
     }
 
-    internal static IEnumerable<Patch> MakePatches(
+    internal static IEnumerable<ReadOnlyPatch> MakePatches(
         List<DiffLine> diffs,
         int            contextLinesCount = DEFAULT_CONTEXT_COUNT,
         bool           collate           = true
@@ -52,6 +52,6 @@ public static class Differ
             patch.Uncollate();
         }
 
-        return patch.Split(contextLinesCount);
+        return patch.Split(contextLinesCount).Select(x => x.AsReadOnly());
     }
 }
