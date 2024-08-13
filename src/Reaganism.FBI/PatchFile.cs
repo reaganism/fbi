@@ -135,6 +135,12 @@ public sealed partial class PatchFile(List<ReadOnlyPatch> patches, string? origi
             switch (line[0])
             {
                 case '@':
+                    if (patch is not null)
+                    {
+                        // Entered new patch, complete old one.
+                        patches.Add(new ReadOnlyPatch(patch));
+                    }
+                    
                     var match = hunk_offset_regex.Match(line);
                     if (!match.Success)
                     {
@@ -163,7 +169,7 @@ public sealed partial class PatchFile(List<ReadOnlyPatch> patches, string? origi
                     }
 
                     delta += patch.Range2.Length - patch.Range1.Length;
-                    patches.Add(new ReadOnlyPatch(patch));
+                    // patches.Add(new ReadOnlyPatch(patch));
                     break;
 
                 case ' ':
@@ -184,6 +190,12 @@ public sealed partial class PatchFile(List<ReadOnlyPatch> patches, string? origi
                 default:
                     throw new InvalidDataException($"Invalid line({i}): {line}");
             }
+        }
+        
+        // Add the last patch.
+        if (patch is not null)
+        {
+            patches.Add(new ReadOnlyPatch(patch));
         }
 
         if (verifyHeaders)
