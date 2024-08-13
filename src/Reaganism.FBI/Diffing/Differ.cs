@@ -35,12 +35,9 @@ public static class Differ
         bool           collate           = true
     )
     {
-        var patch = new Patch
-        {
-            Diffs = diffs,
-        };
-        patch.RecalculateLength();
-        patch.Trim(contextLinesCount);
+        var patch = new Patch(diffs)
+                   .RecalculateLength()
+                   .Trim(contextLinesCount);
 
         if (patch.Length1 == 0)
         {

@@ -18,7 +18,7 @@ public sealed class Patch
     /// <summary>
     ///     The diffs this patch collates.
     /// </summary>
-    public List<DiffLine> Diffs { get; set; } = [];
+    public List<DiffLine> Diffs { get; private set; }
 
     internal int Start1;
     internal int Start2;
@@ -28,9 +28,12 @@ public sealed class Patch
     private static readonly Dictionary<int, string> auto_headers = [];
     private static readonly Dictionary<int, string> headers      = [];
 
-    public Patch() { }
+    public Patch(List<DiffLine>? diffLines = null)
+    {
+        Diffs = diffLines ?? [];
+    }
 
-    public Patch(Patch other)
+    private Patch(Patch other)
     {
         // Shallow-clone the diffs; we don't need to reinitialize since they're
         // structs.
@@ -46,7 +49,7 @@ public sealed class Patch
     ///     Trims the ranges of this patch to the given context line count.
     /// </summary>
     /// <param name="contextLineCount">The amount of context lines.</param>
-    public void Trim(int contextLineCount)
+    public Patch Trim(int contextLineCount)
     {
         var range = TrimRange(new LineRange(0, Diffs.Count), Diffs);
 
@@ -55,7 +58,7 @@ public sealed class Patch
             Length1 = 0;
             Length2 = 0;
             Diffs.Clear();
-            return;
+            return this;
         }
 
         var trimStart = range.Start - contextLineCount;
@@ -77,6 +80,8 @@ public sealed class Patch
                 Length2 -= trimEnd;
             }
         }
+
+        return this;
     }
 
     /// <summary>
@@ -202,13 +207,11 @@ public sealed class Patch
         foreach (var range in ranges)
         {
             var skip = range.Start - endIndex;
-            var patch = new Patch
+            var patch = new Patch(Diffs[range.Start..range.Length])
             {
                 Start1 = end1 + skip,
                 Start2 = end2 + skip,
-                Diffs  = Diffs[range.Start..range.Length],
-            };
-            patch.RecalculateLength();
+            }.RecalculateLength();
             patches.Add(patch);
 
             end1     = patch.Start1 + patch.Length1;
@@ -226,7 +229,6 @@ public sealed class Patch
     /// <returns>The read-only patch with extra information.</returns>
     public ReadOnlyPatch AsReadOnly()
     {
-        RecalculateLength();
         return new ReadOnlyPatch(this);
     }
 
@@ -242,7 +244,7 @@ public sealed class Patch
         return new Patch(this);
     }
 
-    internal void RecalculateLength()
+    internal Patch RecalculateLength()
     {
         Length1 = Diffs.Count;
         Length2 = Diffs.Count;
@@ -258,6 +260,8 @@ public sealed class Patch
                 Length2--;
             }
         }
+
+        return this;
     }
 
     /// <summary>

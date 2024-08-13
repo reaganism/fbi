@@ -63,6 +63,9 @@ public readonly struct ReadOnlyPatch
 
     public ReadOnlyPatch(Patch patch)
     {
+        // Ensure lengths are recalculated.
+        patch.RecalculateLength();
+
         // Shallow-clone the diffs; we don't need to reinitialize since they're
         // structs.  TODO(perf): It'd be nice to avoid this operation.
         Diffs = [..patch.Diffs];
@@ -83,9 +86,8 @@ public readonly struct ReadOnlyPatch
 
     public Patch CreateMutable()
     {
-        return new Patch
+        return new Patch(Diffs.ToList())
         {
-            Diffs   = [..Diffs],
             Start1  = Range1.Start,
             Start2  = Range2.Start,
             Length1 = Range1.Length,
