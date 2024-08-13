@@ -32,9 +32,19 @@ public sealed class Patch
         // Shallow-clone the diffs; we don't need to reinitialize since they're
         // structs.
         Diffs = [..other.Diffs];
-        
+
         Range1 = other.Range1;
         Range2 = other.Range2;
+    }
+
+    /// <summary>
+    ///     Creates a <see cref="ReadOnlyPatch"/> derived from the current state
+    ///     of this patch.
+    /// </summary>
+    /// <returns>The read-only patch with extra information.</returns>
+    public ReadOnlyPatch AsReadOnly()
+    {
+        return new ReadOnlyPatch(this);
     }
 
     /// <summary>
