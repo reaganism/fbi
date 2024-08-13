@@ -140,7 +140,7 @@ public sealed partial class PatchFile(List<ReadOnlyPatch> patches, string? origi
                         // Entered new patch, complete old one.
                         patches.Add(new ReadOnlyPatch(patch));
                     }
-                    
+
                     var match = hunk_offset_regex.Match(line);
                     if (!match.Success)
                     {
@@ -174,24 +174,24 @@ public sealed partial class PatchFile(List<ReadOnlyPatch> patches, string? origi
 
                 case ' ':
                     Debug.Assert(patch is not null);
-                    patch.Diffs.Add(new DiffLine(Operation.EQUALS, line[1..]));
+                    patch.Diffs.Add(new DiffLine(line));
                     break;
 
                 case '+':
                     Debug.Assert(patch is not null);
-                    patch.Diffs.Add(new DiffLine(Operation.INSERT, line[1..]));
+                    patch.Diffs.Add(new DiffLine(line));
                     break;
 
                 case '-':
                     Debug.Assert(patch is not null);
-                    patch.Diffs.Add(new DiffLine(Operation.DELETE, line[1..]));
+                    patch.Diffs.Add(new DiffLine(line));
                     break;
 
                 default:
                     throw new InvalidDataException($"Invalid line({i}): {line}");
             }
         }
-        
+
         // Add the last patch.
         if (patch is not null)
         {

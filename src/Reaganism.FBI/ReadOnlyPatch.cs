@@ -29,7 +29,7 @@ public readonly struct ReadOnlyPatch
     ///     they both provide context for the location of the patch in the
     ///     original text.
     /// </remarks>
-    public IReadOnlyCollection<string> ContextLines { get; }
+    public IReadOnlyCollection<DiffLine> ContextLines { get; }
 
     /// <summary>
     ///     Lines which should be present in the modified text.
@@ -37,7 +37,7 @@ public readonly struct ReadOnlyPatch
     /// <remarks>
     ///     This includes both unmodified (EQUALS) and added (INSERT) lines.
     /// </remarks>
-    public IReadOnlyCollection<string> PatchedLines { get; }
+    public IReadOnlyCollection<DiffLine> PatchedLines { get; }
 
     /// <summary>
     ///     The range of the first text.
@@ -68,11 +68,9 @@ public readonly struct ReadOnlyPatch
         Diffs = [..patch.Diffs];
 
         ContextLines = Diffs.Where(diff => diff.Operation != Operation.INSERT)
-                            .Select(diff => diff.Text)
                             .ToList();
 
         PatchedLines = Diffs.Where(diff => diff.Operation != Operation.DELETE)
-                            .Select(diff => diff.Text)
                             .ToList();
 
         Range1        = patch.Range1;
