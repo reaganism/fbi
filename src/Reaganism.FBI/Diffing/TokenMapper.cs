@@ -5,7 +5,7 @@ using System.Linq;
 namespace Reaganism.FBI.Diffing;
 
 /// <summary>
-///     
+///     Maps lines and words (tokens) to unique integer IDs.
 /// </summary>
 public sealed class TokenMapper
 {
@@ -19,14 +19,21 @@ public sealed class TokenMapper
 
     public TokenMapper()
     {
+        // Add a sentinel value at index 0.
         lineToString.Add("\0");
 
+        // Add ASCII characters as-is.
         for (var i = 0; i < 0x80; i++)
         {
             wordToString.Add(((char)i).ToString());
         }
     }
 
+    /// <summary>
+    ///     Adds a line to the mapper and returns its unique identifier.
+    /// </summary>
+    /// <param name="line">The line to add.</param>
+    /// <returns>The unique ID for the line.</returns>
     public int AddLine(string line)
     {
         if (stringToLine.TryGetValue(line, out var id))
@@ -39,6 +46,11 @@ public sealed class TokenMapper
         return id;
     }
 
+    /// <summary>
+    ///     Adds a word to the mapper and returns its unique identifier.
+    /// </summary>
+    /// <param name="word">The word to add.</param>
+    /// <returns>The unique ID for the word.</returns>
     public int AddWord(string word)
     {
         if (word.Length == 1 && word[0] <= 0x80)
@@ -57,6 +69,12 @@ public sealed class TokenMapper
         return id;
     }
 
+    /// <summary>
+    ///     Converts a line of text into a string of identifiers representing
+    ///     its words.
+    /// </summary>
+    /// <param name="line">The line of text to convert.</param>
+    /// <returns>A string of comma-separated identifiers.</returns>
     public string WordsToIds(string line)
     {
         var b = 0;
@@ -76,17 +94,33 @@ public sealed class TokenMapper
         return string.Join(',', buf.Take(b));
     }
 
+    /// <summary>
+    ///     Converts a collection of lines into a string of identifiers.
+    /// </summary>
+    /// <param name="lines">The collection of lines to convert.</param>
+    /// <returns>A string of comma-separated identifiers.</returns>
     public string LinesToIds(IEnumerable<string> lines)
     {
         return string.Join(',', lines.Select(AddLine));
     }
 
+    /// <summary>
+    ///     Retrieves the word corresponding to a given identifier.
+    /// </summary>
+    /// <param name="id">The identifier for the word.</param>
+    /// <returns>The word associated with the identifier.</returns>
     public string GetWord(int id)
     {
         return wordToString[id];
     }
 
-    private IEnumerable<Range> EnumerateWords(string line)
+    /// <summary>
+    ///     Enumerates the words in a line, yielding ranges for each word or
+    ///     symbol.
+    /// </summary>
+    /// <param name="line">The line of text to process.</param>
+    /// <returns>A collection of ranges representing words or symbols.</returns>
+    private static IEnumerable<Range> EnumerateWords(string line)
     {
         for (var i = 0; i < line.Length;)
         {
