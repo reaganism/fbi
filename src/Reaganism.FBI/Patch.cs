@@ -15,12 +15,20 @@ public sealed class Patch
     /// <summary>
     ///     The range of the first text.
     /// </summary>
-    public LineRange Range1 { get; set; }
+    /// <remarks>
+    ///     The length of this range is not guaranteed to be accurate unless
+    ///     <see cref="RecalculateRanges"/> is called.
+    /// </remarks>
+    internal LineRange Range1 { get; set; }
 
     /// <summary>
     ///     The range of the second text.
     /// </summary>
-    public LineRange Range2 { get; set; }
+    /// <remarks>
+    ///     The length of this range is not guaranteed to be accurate unless
+    ///     <see cref="RecalculateRanges"/> is called.
+    /// </remarks>
+    internal LineRange Range2 { get; set; }
 
     private static readonly Dictionary<int, string> auto_headers = [];
     private static readonly Dictionary<int, string> headers      = [];
