@@ -77,43 +77,7 @@ public readonly struct ReadOnlyPatch
 
         Range1        = patch.Range1;
         Range2        = patch.Range2;
-        TrimmedRange1 = TrimRange(Range1, patch.Diffs);
-        TrimmedRange2 = TrimRange(Range2, patch.Diffs);
-    }
-
-    /// <summary>
-    ///     Produces a new line range with any unnecessary context removed.
-    /// </summary>
-    /// <param name="range">The range to trim.</param>
-    /// <param name="diffs">The diffs this line range encompasses.</param>
-    /// <returns>The trimmed line range.</returns>
-    private static LineRange TrimRange(LineRange range, List<Diff> diffs)
-    {
-        // Fine the first non-EQUALS (meaningful) diff.
-        var start = 0;
-        while (start < diffs.Count && diffs[start].Operation == Operation.EQUALS)
-        {
-            start++;
-        }
-
-        // If we've reached the end already, there's no meaningful content.
-        if (start == diffs.Count)
-        {
-            // We need to return something, so the start of the range may remain
-            // the same, but we give it a length of 0 to represent it's
-            // functionally a no-op.
-            return range with { Length = 0 };
-        }
-
-        // Now that we've located the start, we need to determine the end.
-        var end = 0;
-        while (end > start && diffs[end - 1].Operation == Operation.EQUALS)
-        {
-            end--;
-        }
-
-        // Our new line range includes the offsets we've calculated to remove
-        // any unnecessary context.
-        return new LineRange(range.Start + start, range.Length - (diffs.Count - end));
+        TrimmedRange1 = Patch.TrimRange(Range1, patch.Diffs);
+        TrimmedRange2 = Patch.TrimRange(Range2, patch.Diffs);
     }
 }
