@@ -20,7 +20,7 @@ public readonly record struct DiffLine
     /// </summary>
     public string Text { get; }
 
-    private readonly string lineWithOperation;
+    private readonly string line;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="DiffLine"/> struct.
@@ -29,26 +29,9 @@ public readonly record struct DiffLine
     /// <param name="text">The text <b>without</b> an operation prefix.</param>
     public DiffLine(Operation operation, string text)
     {
-        Operation         = operation;
-        Text              = text;
-        lineWithOperation = operation.LinePrefix + text;
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="DiffLine"/> struct.
-    /// </summary>
-    /// <param name="lineWithOperation">The line <b>with</b> an operation prefix.</param>
-    public DiffLine(string lineWithOperation)
-    {
-        Operation = lineWithOperation[0] switch
-        {
-            '+' => Operation.INSERT,
-            '-' => Operation.DELETE,
-            ' ' => Operation.EQUALS,
-            _   => throw new ArgumentException("Invalid diff line.", nameof(lineWithOperation)),
-        };
-        Text                   = lineWithOperation[1..];
-        this.lineWithOperation = lineWithOperation;
+        Operation = operation;
+        Text      = text;
+        line      = operation.LinePrefix + text;
     }
 
     /// <summary>
@@ -56,6 +39,6 @@ public readonly record struct DiffLine
     /// </summary>
     public override string ToString()
     {
-        return lineWithOperation;
+        return line;
     }
 }

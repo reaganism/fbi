@@ -132,22 +132,22 @@ internal static class LineMatching
 
             while (l < i)
             {
-                list.Add(new DiffLine(originalLines[l++])); // DELETE
+                list.Add(new DiffLine(Operation.DELETE, originalLines[l++]));
             }
 
             while (r < matches[i])
             {
-                list.Add(new DiffLine(modifiedLines[r++])); // INSERT
+                list.Add(new DiffLine(Operation.INSERT, modifiedLines[r++]));
             }
 
             if (originalLines[l] != modifiedLines[r])
             {
-                list.Add(new DiffLine(originalLines[l])); // DELETE
-                list.Add(new DiffLine(originalLines[r])); // INSERT
+                list.Add(new DiffLine(Operation.DELETE, originalLines[l]));
+                list.Add(new DiffLine(Operation.INSERT, originalLines[r]));
             }
             else
             {
-                list.Add(new DiffLine(originalLines[l])); // EQUAL
+                list.Add(new DiffLine(Operation.EQUALS, originalLines[l]));
             }
 
             l++;
@@ -156,12 +156,12 @@ internal static class LineMatching
 
         while (l < originalLines.Count)
         {
-            list.Add(new DiffLine(originalLines[l++])); // DELETE
+            list.Add(new DiffLine(Operation.DELETE, originalLines[l++]));
         }
 
         while (r < modifiedLines.Count)
         {
-            list.Add(new DiffLine(modifiedLines[r++])); // INSERT
+            list.Add(new DiffLine(Operation.INSERT, modifiedLines[r++]));
         }
 
         return list;
