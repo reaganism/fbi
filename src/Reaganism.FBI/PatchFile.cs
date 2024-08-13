@@ -13,10 +13,19 @@ public partial class PatchFile(List<ReadOnlyPatch> patches, string originalPatch
 {
     private static readonly Regex hunk_offset_regex = HunkOffsetRegex();
 
+    /// <summary>
+    ///     The patches contained in this patch file.
+    /// </summary>
     public List<ReadOnlyPatch> Patches { get; } = patches;
 
+    /// <summary>
+    ///     The original path of the file being patched.
+    /// </summary>
     public string OriginalPath { get; set; } = originalPatch;
 
+    /// <summary>
+    ///     The modified path of the file being patched.
+    /// </summary>
     public string ModifiedPath { get; set; } = modifiedPath;
 
     /// <summary>
