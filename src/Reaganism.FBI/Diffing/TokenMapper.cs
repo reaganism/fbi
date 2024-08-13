@@ -9,13 +9,13 @@ namespace Reaganism.FBI.Diffing;
 /// </summary>
 public sealed class TokenMapper
 {
-    private readonly List<string>            lineToString = [];
-    private readonly Dictionary<string, int> stringToLine = new();
+    private readonly List<string>               lineToString = [];
+    private readonly Dictionary<string, ushort> stringToLine = new();
 
-    private readonly List<string>            wordToString = [];
-    private readonly Dictionary<string, int> stringToWord = new();
+    private readonly List<string>               wordToString = [];
+    private readonly Dictionary<string, ushort> stringToWord = new();
 
-    private int[] buf = new int[4096];
+    private ushort[] buf = new ushort[4096];
 
     public TokenMapper()
     {
@@ -34,14 +34,14 @@ public sealed class TokenMapper
     /// </summary>
     /// <param name="line">The line to add.</param>
     /// <returns>The unique ID for the line.</returns>
-    public int AddLine(string line)
+    public ushort AddLine(string line)
     {
         if (stringToLine.TryGetValue(line, out var id))
         {
             return id;
         }
 
-        stringToLine.Add(line, id = lineToString.Count);
+        stringToLine.Add(line, id = (ushort)lineToString.Count);
         lineToString.Add(line);
         return id;
     }
@@ -51,7 +51,7 @@ public sealed class TokenMapper
     /// </summary>
     /// <param name="word">The word to add.</param>
     /// <returns>The unique ID for the word.</returns>
-    public int AddWord(string word)
+    public ushort AddWord(string word)
     {
         if (word.Length == 1 && word[0] <= 0x80)
         {
@@ -64,7 +64,7 @@ public sealed class TokenMapper
             return id;
         }
 
-        stringToWord.Add(word, id = wordToString.Count);
+        stringToWord.Add(word, id = (ushort)wordToString.Count);
         wordToString.Add(word);
         return id;
     }
@@ -81,7 +81,7 @@ public sealed class TokenMapper
 
         foreach (var r in EnumerateWords(line))
         {
-            string word = line[r];
+            var word = line[r];
 
             if (b >= buf.Length)
             {
@@ -109,7 +109,7 @@ public sealed class TokenMapper
     /// </summary>
     /// <param name="id">The identifier for the word.</param>
     /// <returns>The word associated with the identifier.</returns>
-    public string GetWord(int id)
+    public string GetWord(ushort id)
     {
         return wordToString[id];
     }
