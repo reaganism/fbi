@@ -68,7 +68,7 @@ public readonly struct ReadOnlyPatch
 
         // Shallow-clone the diffs; we don't need to reinitialize since they're
         // structs.  TODO(perf): It'd be nice to avoid this operation.
-        Diffs = [..patch.Diffs];
+        Diffs = patch.Diffs.ToList();
 
         ContextLines = Diffs.Where(diff => diff.Operation != Operation.INSERT)
                             .Select(x => x.Text)
