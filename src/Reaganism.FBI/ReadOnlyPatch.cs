@@ -73,8 +73,8 @@ public readonly struct ReadOnlyPatch
         PatchedLines = Diffs.Where(diff => diff.Operation != Operation.DELETE)
                             .ToList();
 
-        Range1        = patch.Range1;
-        Range2        = patch.Range2;
+        Range1        = new LineRange(patch.Start1, 0).WithLength(patch.Length1);
+        Range2        = new LineRange(patch.Start2, 0).WithLength(patch.Length2);
         TrimmedRange1 = Patch.TrimRange(Range1, patch.Diffs);
         TrimmedRange2 = Patch.TrimRange(Range2, patch.Diffs);
     }

@@ -9,13 +9,15 @@ namespace Reaganism.FBI;
 ///     a patch with a header.
 /// </summary>
 /// <param name="Start">The starting line.</param>
-/// <param name="Length">The amount of lines from the start.</param>
-public readonly record struct LineRange(int Start, int Length)
+/// <param name="End">The ending line.</param>
+public readonly record struct LineRange(int Start, int End)
 {
-    /// <summary>
-    ///     The ending line.
-    /// </summary>
-    public int End => Start + Length;
+    public int Length => End - Start;
+
+    public LineRange WithLength(int length)
+    {
+        return this with { End = Start + length };
+    }
 
     public bool Contains(int index)
     {
@@ -35,16 +37,6 @@ public readonly record struct LineRange(int Start, int Length)
     public override string ToString()
     {
         return $"[{Start},{End})";
-    }
-
-    public static LineRange operator +(LineRange range, int i)
-    {
-        return new LineRange(range.Start + i, range.End + i);
-    }
-
-    public static LineRange operator -(LineRange range, int i)
-    {
-        return new LineRange(range.Start - i, range.End - i);
     }
 
     public IEnumerable<LineRange> Except(IEnumerable<LineRange> except, bool presorted = false)
@@ -69,6 +61,16 @@ public readonly record struct LineRange(int Start, int Length)
         {
             yield return new LineRange(start, End);
         }
+    }
+
+    public static LineRange operator +(LineRange range, int i)
+    {
+        return new LineRange(range.Start + i, range.End + i);
+    }
+
+    public static LineRange operator -(LineRange range, int i)
+    {
+        return new LineRange(range.Start - i, range.End - i);
     }
 
     public static implicit operator Range(LineRange range)

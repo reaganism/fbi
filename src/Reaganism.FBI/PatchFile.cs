@@ -149,26 +149,27 @@ public sealed partial class PatchFile(List<ReadOnlyPatch> patches, string? origi
 
                     patch = new Patch
                     {
-                        Range1 = new LineRange(int.Parse(match.Groups[1].Value) - 1, int.Parse(match.Groups[2].Value)),
-                        Range2 = new LineRange(0,                                    int.Parse(match.Groups[4].Value)),
+                        Start1  = int.Parse(match.Groups[1].Value) - 1,
+                        Length1 = int.Parse(match.Groups[2].Value),
+                        Length2 = int.Parse(match.Groups[4].Value),
                     };
 
                     // Range2 start is automatically determined.
                     if (match.Groups[3].Value == "_")
                     {
-                        patch.Range2 = patch.Range2 with { Start = patch.Range1.Start + delta };
+                        patch.Start2 = patch.Start1 + delta;
                     }
                     else
                     {
-                        patch.Range2 = patch.Range2 with { Start = int.Parse(match.Groups[3].Value) - 1 };
+                        patch.Start2 = int.Parse(match.Groups[3].Value) - 1;
 
-                        if (verifyHeaders && patch.Range2.Start != patch.Range1.Start + delta)
+                        if (verifyHeaders && patch.Start2 != patch.Start1 + delta)
                         {
-                            throw new InvalidDataException($"Applied offset mismatch; expected: {patch.Range1.Start + delta + 1}, actual: {patch.Range2.Start + 1}");
+                            throw new InvalidDataException($"Applied offset mismatch; expected: {patch.Start1 + delta + 1}, actual: {patch.Start2 + 1}");
                         }
                     }
 
-                    delta += patch.Range2.Length - patch.Range1.Length;
+                    delta += patch.Length2 - patch.Length1;
                     // patches.Add(new ReadOnlyPatch(patch));
                     break;
 

@@ -20,23 +20,10 @@ public sealed class Patch
     /// </summary>
     public List<DiffLine> Diffs { get; private set; } = [];
 
-    /// <summary>
-    ///     The range of the first text.
-    /// </summary>
-    /// <remarks>
-    ///     The length of this range is not guaranteed to be accurate unless
-    ///     <see cref="RecalculateRanges"/> is called.
-    /// </remarks>
-    internal LineRange Range1 { get; set; }
-
-    /// <summary>
-    ///     The range of the second text.
-    /// </summary>
-    /// <remarks>
-    ///     The length of this range is not guaranteed to be accurate unless
-    ///     <see cref="RecalculateRanges"/> is called.
-    /// </remarks>
-    internal LineRange Range2 { get; set; }
+    internal int Start1;
+    internal int Start2;
+    internal int Length1;
+    internal int Length2;
 
     private static readonly Dictionary<int, string> auto_headers = [];
     private static readonly Dictionary<int, string> headers      = [];
@@ -49,8 +36,10 @@ public sealed class Patch
         // structs.
         Diffs = [..other.Diffs];
 
-        Range1 = other.Range1;
-        Range2 = other.Range2;
+        Start1  = other.Start1;
+        Start2  = other.Start2;
+        Length1 = other.Length1;
+        Length2 = other.Length2;
     }
 
     /// <summary>
@@ -63,8 +52,8 @@ public sealed class Patch
 
         if (range.Length == 0)
         {
-            Range1 = Range1 with { Length = 0 };
-            Range2 = Range2 with { Length = 0 };
+            Length1 = 0;
+            Length2 = 0;
             Diffs.Clear();
             return;
         }
@@ -75,15 +64,17 @@ public sealed class Patch
             if (trimStart > 0)
             {
                 Diffs.RemoveRange(0, trimStart);
-                Range1 = new LineRange(Start: Range1.Start + trimStart, Length: Range1.Length - trimStart);
-                Range2 = new LineRange(Start: Range2.Start + trimStart, Length: Range2.Length - trimStart);
+                Start1  += trimStart;
+                Start2  += trimStart;
+                Length1 -= trimStart;
+                Length2 -= trimStart;
             }
 
             if (trimEnd > 0)
             {
-                Diffs.RemoveRange(Diffs.Count                 - trimEnd, trimEnd);
-                Range1 = Range1 with { Length = Range1.Length - trimEnd };
-                Range2 = Range2 with { Length = Range2.Length - trimEnd };
+                Diffs.RemoveRange(Diffs.Count - trimEnd, trimEnd);
+                Length1 -= trimEnd;
+                Length2 -= trimEnd;
             }
         }
     }
@@ -203,26 +194,26 @@ public sealed class Patch
         // Add the final range.
         ranges.Add(new LineRange(start, Diffs.Count));
 
-        var patches      = new List<Patch>(ranges.Count);
-        var end1         = Range1.Start;
-        var end2         = Range2.Start;
-        var endDiffIndex = 0;
+        var patches  = new List<Patch>(ranges.Count);
+        var end1     = Start1;
+        var end2     = Start2;
+        var endIndex = 0;
 
         foreach (var range in ranges)
         {
-            var skip = range.Start - endDiffIndex;
+            var skip = range.Start - endIndex;
             var patch = new Patch
             {
-                Range1 = new LineRange(end1 + skip, 0),
-                Range2 = new LineRange(end2 + skip, 0),
+                Start1 = end1 + skip,
+                Start2 = end2 + skip,
                 Diffs  = Diffs[range.Start..range.Length],
             };
-            patch.RecalculateRanges();
+            patch.RecalculateLength();
             patches.Add(patch);
 
-            end1         = patch.Range1.Start + patch.Range1.Length;
-            end2         = patch.Range2.Start + patch.Range2.Length;
-            endDiffIndex = range.End;
+            end1     = patch.Start1 + patch.Length1;
+            end2     = patch.Start2 + patch.Length2;
+            endIndex = range.End;
         }
 
         return patches;
@@ -235,7 +226,7 @@ public sealed class Patch
     /// <returns>The read-only patch with extra information.</returns>
     public ReadOnlyPatch AsReadOnly()
     {
-        RecalculateRanges();
+        RecalculateLength();
         return new ReadOnlyPatch(this);
     }
 
@@ -251,25 +242,22 @@ public sealed class Patch
         return new Patch(this);
     }
 
-    private void RecalculateRanges()
+    private void RecalculateLength()
     {
-        var length1 = Diffs.Count;
-        var length2 = Diffs.Count;
+        Length1 = Diffs.Count;
+        Length2 = Diffs.Count;
 
         foreach (var diff in Diffs)
         {
             if (diff.Operation == Operation.INSERT)
             {
-                length1--;
+                Length1--;
             }
             else if (diff.Operation == Operation.DELETE)
             {
-                length2--;
+                Length2--;
             }
         }
-
-        Range1 = Range1 with { Length = length1 };
-        Range2 = Range2 with { Length = length2 };
     }
 
     /// <summary>
@@ -321,7 +309,7 @@ public sealed class Patch
             // We need to return something, so the start of the range may remain
             // the same, but we give it a length of 0 to represent it's
             // functionally a no-op.
-            return range with { Length = 0 };
+            return range.WithLength(0);
         }
 
         // Now that we've located the start, we need to determine the end.
