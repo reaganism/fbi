@@ -18,7 +18,7 @@ public sealed class Patch
     /// <summary>
     ///     The diffs this patch collates.
     /// </summary>
-    public List<DiffLine> Diffs { get; private set; } = [];
+    public List<DiffLine> Diffs { get; set; } = [];
 
     internal int Start1;
     internal int Start2;
@@ -242,7 +242,7 @@ public sealed class Patch
         return new Patch(this);
     }
 
-    private void RecalculateLength()
+    internal void RecalculateLength()
     {
         Length1 = Diffs.Count;
         Length2 = Diffs.Count;
