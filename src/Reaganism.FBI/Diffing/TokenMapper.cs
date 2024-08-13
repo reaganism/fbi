@@ -15,7 +15,7 @@ public sealed class TokenMapper
     private readonly List<string>               wordToString = [];
     private readonly Dictionary<string, ushort> stringToWord = new();
 
-    private ushort[] buf = new ushort[4096];
+    private char[] buf = new char[4096];
 
     public TokenMapper()
     {
@@ -88,7 +88,7 @@ public sealed class TokenMapper
                 Array.Resize(ref buf, buf.Length * 2);
             }
 
-            buf[b++] = AddWord(word);
+            buf[b++] = (char)AddWord(word);
         }
 
         return string.Join(',', buf.Take(b));
