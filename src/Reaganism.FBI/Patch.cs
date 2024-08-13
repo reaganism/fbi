@@ -5,6 +5,13 @@ namespace Reaganism.FBI;
 /// <summary>
 ///     Represents a patch, which is a collection of diffs.
 /// </summary>
+/// <remarks>
+///     This is a mutable representation designed for modifications before the
+///     finalization of data. Most APIs are intended to consume
+///     <see cref="ReadOnlyPatch"/>es, which are produced from data within this
+///     class.
+/// </remarks>
+/// <seealso cref="ReadOnlyPatch"/>
 public sealed class Patch
 {
     /// <summary>

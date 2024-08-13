@@ -8,6 +8,12 @@ namespace Reaganism.FBI;
 ///     containing contextualized data generated from the final state of the
 ///     <see cref="Patch"/> instance it was created from.
 /// </summary>
+/// <remarks>
+///     <see cref="Patch"/> should be used for the initial creation and basic
+///     processing. <see cref="ReadOnlyPatch"/>es are for working with finalized
+///     data.
+/// </remarks>
+/// <seealso cref="Patch"/>
 public readonly struct ReadOnlyPatch
 {
     /// <summary>
