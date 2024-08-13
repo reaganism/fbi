@@ -138,7 +138,7 @@ public sealed partial class PatchFile(List<ReadOnlyPatch> patches, string? origi
                     if (patch is not null)
                     {
                         // Entered new patch, complete old one.
-                        patches.Add(new ReadOnlyPatch(patch));
+                        patches.Add(patch.AsReadOnly());
                     }
 
                     var match = hunk_offset_regex.Match(line);
@@ -196,7 +196,7 @@ public sealed partial class PatchFile(List<ReadOnlyPatch> patches, string? origi
         // Add the last patch.
         if (patch is not null)
         {
-            patches.Add(new ReadOnlyPatch(patch));
+            patches.Add(patch.AsReadOnly());
         }
 
         if (verifyHeaders)
