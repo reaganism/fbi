@@ -18,7 +18,7 @@ public sealed class Patch
     /// <summary>
     ///     The diffs this patch collates.
     /// </summary>
-    public List<Diff> Diffs { get; private set; } = [];
+    public List<DiffLine> Diffs { get; private set; } = [];
 
     /// <summary>
     ///     The range of the first text.
@@ -103,8 +103,8 @@ public sealed class Patch
         // not remove any diffs, it only does re-ordering to tidy up the patch.
         // The insertions list is a temporary list of any insertions we find
         // that can be held until we find a deletion to pair them with.
-        var uncollated = new List<Diff>(Diffs.Count);
-        var insertions = new List<Diff>();
+        var uncollated = new List<DiffLine>(Diffs.Count);
+        var insertions = new List<DiffLine>();
 
         foreach (var diff in Diffs)
         {
@@ -306,7 +306,7 @@ public sealed class Patch
     /// <param name="range">The range to trim.</param>
     /// <param name="diffs">The diffs this line range encompasses.</param>
     /// <returns>The trimmed line range.</returns>
-    internal static LineRange TrimRange(LineRange range, List<Diff> diffs)
+    internal static LineRange TrimRange(LineRange range, List<DiffLine> diffs)
     {
         // Fine the first non-EQUALS (meaningful) diff.
         var start = 0;

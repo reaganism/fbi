@@ -19,7 +19,7 @@ public readonly struct ReadOnlyPatch
     /// <summary>
     ///     The diffs this patch collates.
     /// </summary>
-    public IReadOnlyCollection<Diff> Diffs { get; }
+    public IReadOnlyCollection<DiffLine> Diffs { get; }
 
     /// <summary>
     ///     Contextual lines which do not introduce new content.

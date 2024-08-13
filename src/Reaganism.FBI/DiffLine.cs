@@ -3,7 +3,7 @@ namespace Reaganism.FBI;
 /// <summary>
 ///     Represents a line diff.
 /// </summary>
-public readonly record struct Diff(Operation Operation, string Text)
+public readonly record struct DiffLine(Operation Operation, string Text)
 {
     /// <summary>
     ///     The diff operation of this diff.

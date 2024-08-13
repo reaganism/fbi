@@ -174,17 +174,17 @@ public sealed partial class PatchFile(List<ReadOnlyPatch> patches, string? origi
 
                 case ' ':
                     Debug.Assert(patch is not null);
-                    patch.Diffs.Add(new Diff(Operation.EQUALS, line[1..]));
+                    patch.Diffs.Add(new DiffLine(Operation.EQUALS, line[1..]));
                     break;
 
                 case '+':
                     Debug.Assert(patch is not null);
-                    patch.Diffs.Add(new Diff(Operation.INSERT, line[1..]));
+                    patch.Diffs.Add(new DiffLine(Operation.INSERT, line[1..]));
                     break;
 
                 case '-':
                     Debug.Assert(patch is not null);
-                    patch.Diffs.Add(new Diff(Operation.DELETE, line[1..]));
+                    patch.Diffs.Add(new DiffLine(Operation.DELETE, line[1..]));
                     break;
 
                 default:
