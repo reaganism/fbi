@@ -44,6 +44,7 @@ public sealed class Patch
     /// <returns>The read-only patch with extra information.</returns>
     public ReadOnlyPatch AsReadOnly()
     {
+        RecalculateRanges();
         return new ReadOnlyPatch(this);
     }
 
@@ -57,6 +58,27 @@ public sealed class Patch
     public Patch Clone()
     {
         return new Patch(this);
+    }
+
+    private void RecalculateRanges()
+    {
+        var length1 = Diffs.Count;
+        var length2 = Diffs.Count;
+
+        foreach (var diff in Diffs)
+        {
+            if (diff.Operation == Operation.INSERT)
+            {
+                length1--;
+            }
+            else if (diff.Operation == Operation.DELETE)
+            {
+                length2--;
+            }
+        }
+
+        Range1 = Range1 with { Length = length1 };
+        Range2 = Range2 with { Length = length2 };
     }
 
     /// <summary>
