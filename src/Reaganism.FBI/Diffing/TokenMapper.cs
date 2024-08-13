@@ -9,6 +9,10 @@ namespace Reaganism.FBI.Diffing;
 /// </summary>
 public sealed class TokenMapper
 {
+    public int MaxLineId => lineToString.Count;
+
+    public int MaxWordId => wordToString.Count;
+
     private readonly List<string>               lineToString = [];
     private readonly Dictionary<string, ushort> stringToLine = new();
 
