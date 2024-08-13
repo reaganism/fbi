@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Reaganism.FBI;
@@ -9,7 +10,7 @@ namespace Reaganism.FBI;
 /// <summary>
 ///     A patch file, containing a collection of <see cref="ReadOnlyPatch"/>es.
 /// </summary>
-public partial class PatchFile(List<ReadOnlyPatch> patches, string originalPatch, string modifiedPath)
+public sealed partial class PatchFile(List<ReadOnlyPatch> patches, string? originalPatch, string? modifiedPath)
 {
     private static readonly Regex hunk_offset_regex = HunkOffsetRegex();
 
@@ -21,12 +22,45 @@ public partial class PatchFile(List<ReadOnlyPatch> patches, string originalPatch
     /// <summary>
     ///     The original path of the file being patched.
     /// </summary>
-    public string OriginalPath { get; set; } = originalPatch;
+    public string? OriginalPath { get; set; } = originalPatch;
 
     /// <summary>
     ///     The modified path of the file being patched.
     /// </summary>
-    public string ModifiedPath { get; set; } = modifiedPath;
+    public string? ModifiedPath { get; set; } = modifiedPath;
+
+    public string ToString(bool autoOffset, string? originalPath = null, string? modifiedPath = null)
+    {
+        originalPath ??= OriginalPath;
+        modifiedPath ??= ModifiedPath;
+
+        var sb = new StringBuilder();
+        {
+            if (originalPath is not null && modifiedPath is not null)
+            {
+                sb.Append("--- ").AppendLine(originalPath);
+                sb.Append("+++ ").AppendLine(modifiedPath);
+            }
+
+            foreach (var patch in Patches)
+            {
+                sb.AppendLine(Patch.GetHeader(patch.Range1, patch.Range2, autoOffset));
+                {
+                    foreach (var diff in patch.Diffs)
+                    {
+                        sb.AppendLine(diff.ToString());
+                    }
+                }
+            }
+        }
+
+        return sb.ToString();
+    }
+
+    public override string ToString()
+    {
+        return ToString(false);
+    }
 
     /// <summary>
     ///     Creates a patch file from the given text.
@@ -60,8 +94,8 @@ public partial class PatchFile(List<ReadOnlyPatch> patches, string originalPatch
         var patch   = default(Patch);
         var delta   = 0;
 
-        var originalPath = string.Empty;
-        var modifiedPath = string.Empty;
+        var originalPath = default(string);
+        var modifiedPath = default(string);
 
         var i = 0;
         foreach (var line in lines)
@@ -94,8 +128,8 @@ public partial class PatchFile(List<ReadOnlyPatch> patches, string originalPatch
                     continue;
                 }
 
-                Debug.Assert(!string.IsNullOrEmpty(originalPath));
-                Debug.Assert(!string.IsNullOrEmpty(modifiedPath));
+                // Debug.Assert(!string.IsNullOrEmpty(originalPath));
+                // Debug.Assert(!string.IsNullOrEmpty(modifiedPath));
             }
 
             switch (line[0])
