@@ -19,12 +19,32 @@ public partial class PatchFile(List<ReadOnlyPatch> patches, string originalPatch
 
     public string ModifiedPath { get; set; } = modifiedPath;
 
+    /// <summary>
+    ///     Creates a patch file from the given text.
+    /// </summary>
+    /// <param name="patchText">The text to parse.</param>
+    /// <param name="verifyHeaders">
+    ///     Whether header offsets should be verified.
+    /// </param>
+    /// <returns>
+    ///     A <see cref="PatchFile"/> instance containing the parsed patches.
+    /// </returns>
     public static PatchFile FromText(string patchText, bool verifyHeaders = true)
     {
         // TODO: Can we trim all whitespace and not just carriage returns?
         return FromLines(patchText.Split('\n').Select(x => x.TrimEnd('\r')), verifyHeaders);
     }
 
+    /// <summary>
+    ///     Creates a patch file from the given lines.
+    /// </summary>
+    /// <param name="lines">The lines to parse.</param>
+    /// <param name="verifyHeaders">
+    ///     Whether header offsets should be verified.
+    /// </param>
+    /// <returns>
+    ///     A <see cref="PatchFile"/> instance containing the parsed patches.
+    /// </returns>
     public static PatchFile FromLines(IEnumerable<string> lines, bool verifyHeaders = true)
     {
         var patches = new List<ReadOnlyPatch>();
