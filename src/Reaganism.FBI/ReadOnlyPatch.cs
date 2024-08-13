@@ -42,12 +42,12 @@ public readonly struct ReadOnlyPatch
     /// <summary>
     ///     The range of the first text.
     /// </summary>
-    public LineRange Range1 { get; }
+    public LineRange Range1 { get; init; }
 
     /// <summary>
     ///     The range of the second text.
     /// </summary>
-    public LineRange Range2 { get; }
+    public LineRange Range2 { get; init; }
 
     /// <summary>
     ///     The trimmed range of the first text, keeping only meaningful

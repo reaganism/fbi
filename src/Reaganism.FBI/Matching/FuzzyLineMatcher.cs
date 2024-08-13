@@ -9,11 +9,11 @@ namespace Reaganism.FBI.Matching;
 
 public sealed class FuzzyLineMatcher
 {
-    private const float default_min_match_score = 0.5f;
+    public const float DEFAULT_MIN_MATCH_SCORE = 0.5f;
 
     public int MaxMatchOffset { get; set; } = MatchMatrix.DEFAULT_MAX_OFFSET;
 
-    public float MinMatchScore { get; set; } = default_min_match_score;
+    public float MinMatchScore { get; set; } = DEFAULT_MIN_MATCH_SCORE;
 
     public void MatchLinesByWords(int[] matches, IReadOnlyList<string> wmLines1, IReadOnlyList<string> wmLines2)
     {
