@@ -56,19 +56,22 @@ partial class Patch
     [PublicAPI]
     public static string GetHeader(LineRange range1, LineRange range2, bool auto)
     {
-        var map  = auto ? auto_headers : headers;
+        var map = auto ? auto_headers : headers;
         // var hash = range1.GetHashCode() ^ range2.GetHashCode();
 
-        if (map.TryGetValue((range1, range2), out var header))
+        lock (map)
         {
-            return header;
-        }
+            if (map.TryGetValue((range1, range2), out var header))
+            {
+                return header;
+            }
 
-        if (auto)
-        {
-            return map[(range1, range2)] = $"@@ -{range1.Start + 1},{range1.Length} +_,{range2.Length} @@";
-        }
+            if (auto)
+            {
+                return map[(range1, range2)] = $"@@ -{range1.Start + 1},{range1.Length} +_,{range2.Length} @@";
+            }
 
-        return map[(range1, range2)] = $"@@ -{range1.Start + 1},{range1.Length} +{range2.Start + 1},{range2.Length} @@";
+            return map[(range1, range2)] = $"@@ -{range1.Start + 1},{range1.Length} +{range2.Start + 1},{range2.Length} @@";
+        }
     }
 }

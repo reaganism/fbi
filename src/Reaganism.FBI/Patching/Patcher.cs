@@ -549,7 +549,7 @@ public sealed class Patcher
         // (increasing offset) are added to the patch.
         for (int i = 0, j = 0, pLoc = -1; i < patch.Range1.Length; i++)
         {
-            var mLoc = match[j];
+            var mLoc = match[i];
 
             // Insert extra target lines into the patch.
             if (mLoc >= 0 && pLoc >= 0 && mLoc - pLoc > 1)
