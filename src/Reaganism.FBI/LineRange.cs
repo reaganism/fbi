@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using JetBrains.Annotations;
+
 namespace Reaganism.FBI;
 
 /// <summary>
@@ -10,44 +12,64 @@ namespace Reaganism.FBI;
 /// </summary>
 /// <param name="Start">The starting line.</param>
 /// <param name="End">The ending line.</param>
-public readonly record struct LineRange(int Start, int End)
+[PublicAPI]
+public readonly record struct LineRange([PublicAPI] int Start, [PublicAPI] int End)
 {
-    public int Length => End - Start;
+    [PublicAPI]
+    public int Length
+    {
+        [PublicAPI] get => End - Start;
+    }
 
-    public int First => Start;
+    [PublicAPI]
+    public int First
+    {
+        [PublicAPI] get => Start;
+    }
 
-    public int Last => End - 1;
+    [PublicAPI]
+    public int Last
+    {
+        [PublicAPI] get => End - 1;
+    }
 
+    [PublicAPI]
     public LineRange WithLength(int length)
     {
         return this with { End = Start + length };
     }
 
+    [PublicAPI]
     public LineRange WithLast(int last)
     {
         return this with { End = last + 1 };
     }
 
+    [PublicAPI]
     public bool Contains(int index)
     {
         return Start <= index && index < End;
     }
 
+    [PublicAPI]
     public bool Contains(LineRange range)
     {
         return range.Start >= Start && range.End <= End;
     }
 
+    [PublicAPI]
     public bool Intersects(LineRange range)
     {
         return range.Start < End || range.End > Start;
     }
 
+    [PublicAPI]
     public override string ToString()
     {
         return $"[{Start},{End})";
     }
 
+    [PublicAPI]
     public IEnumerable<LineRange> Except(IEnumerable<LineRange> except, bool presorted = false)
     {
         if (!presorted)
@@ -72,16 +94,19 @@ public readonly record struct LineRange(int Start, int End)
         }
     }
 
+    [PublicAPI]
     public static LineRange operator +(LineRange range, int i)
     {
         return new LineRange(range.Start + i, range.End + i);
     }
 
+    [PublicAPI]
     public static LineRange operator -(LineRange range, int i)
     {
         return new LineRange(range.Start - i, range.End - i);
     }
 
+    [PublicAPI]
     public static implicit operator Range(LineRange range)
     {
         return new Range(Index.FromStart(range.Start), Index.FromStart(range.End));

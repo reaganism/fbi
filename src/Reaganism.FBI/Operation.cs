@@ -1,8 +1,11 @@
+using JetBrains.Annotations;
+
 namespace Reaganism.FBI;
 
 /// <summary>
 ///     A diffing operation.
 /// </summary>
+[PublicAPI]
 public readonly record struct Operation
 {
     // PERF: String literals are used here in favor of character literals to
@@ -12,16 +15,19 @@ public readonly record struct Operation
     /// <summary>
     ///     "Delete" (<c>-</c>) operation; removes the line.
     /// </summary>
+    [PublicAPI]
     public static readonly Operation DELETE = new("-");
 
     /// <summary>
     ///     "Insert" (<c>+</c>) operation; adds the line.
     /// </summary>
+    [PublicAPI]
     public static readonly Operation INSERT = new("+");
 
     /// <summary>
     ///     "Equals" (<c> </c>) operation (no-op); the line is unchanged.
     /// </summary>
+    [PublicAPI]
     public static readonly Operation EQUALS = new(" ");
 
     /// <summary>
@@ -31,7 +37,8 @@ public readonly record struct Operation
     ///     "No operation" is also represented by an operation, in which case
     ///     this value is '<c> </c>' (<b>NOT</b> empty/no value).
     /// </remarks>
-    public string LinePrefix { get; }
+    [PublicAPI]
+    public string LinePrefix { [PublicAPI] get; }
 
     private Operation(string linePrefix)
     {

@@ -2,16 +2,27 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using JetBrains.Annotations;
+
 namespace Reaganism.FBI.Diffing;
 
 /// <summary>
 ///     Maps lines and words (tokens) to unique integer IDs.
 /// </summary>
+[PublicAPI]
 public sealed class TokenMapper
 {
-    public int MaxLineId => lineToString.Count;
+    [PublicAPI]
+    public int MaxLineId
+    {
+        [PublicAPI] get => lineToString.Count;
+    }
 
-    public int MaxWordId => wordToString.Count;
+    [PublicAPI]
+    public int MaxWordId
+    {
+        [PublicAPI] get => wordToString.Count;
+    }
 
     private readonly List<string>               lineToString = [];
     private readonly Dictionary<string, ushort> stringToLine = new();
@@ -21,6 +32,7 @@ public sealed class TokenMapper
 
     private char[] buf = new char[4096];
 
+    [PublicAPI]
     public TokenMapper()
     {
         // Add a sentinel value at index 0.
@@ -38,6 +50,7 @@ public sealed class TokenMapper
     /// </summary>
     /// <param name="line">The line to add.</param>
     /// <returns>The unique ID for the line.</returns>
+    [PublicAPI]
     public ushort AddLine(string line)
     {
         if (stringToLine.TryGetValue(line, out var id))
@@ -55,6 +68,7 @@ public sealed class TokenMapper
     /// </summary>
     /// <param name="word">The word to add.</param>
     /// <returns>The unique ID for the word.</returns>
+    [PublicAPI]
     public ushort AddWord(string word)
     {
         if (word.Length == 1 && word[0] <= 0x80)
@@ -79,6 +93,7 @@ public sealed class TokenMapper
     /// </summary>
     /// <param name="line">The line of text to convert.</param>
     /// <returns>A string of comma-separated identifiers.</returns>
+    [PublicAPI]
     public string WordsToIds(string line)
     {
         var b = 0;
@@ -103,6 +118,7 @@ public sealed class TokenMapper
     /// </summary>
     /// <param name="lines">The collection of lines to convert.</param>
     /// <returns>A string of comma-separated identifiers.</returns>
+    [PublicAPI]
     public string LinesToIds(IEnumerable<string> lines)
     {
         return string.Join(',', lines.Select(AddLine));
@@ -113,6 +129,7 @@ public sealed class TokenMapper
     /// </summary>
     /// <param name="id">The identifier for the word.</param>
     /// <returns>The word associated with the identifier.</returns>
+    [PublicAPI]
     public string GetWord(ushort id)
     {
         return wordToString[id];

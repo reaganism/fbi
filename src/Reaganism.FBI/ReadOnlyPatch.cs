@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using JetBrains.Annotations;
+
 namespace Reaganism.FBI;
 
 /// <summary>
@@ -14,12 +16,14 @@ namespace Reaganism.FBI;
 ///     data.
 /// </remarks>
 /// <seealso cref="Patch"/>
+[PublicAPI]
 public readonly struct ReadOnlyPatch
 {
     /// <summary>
     ///     The diffs this patch collates.
     /// </summary>
-    public IReadOnlyCollection<DiffLine> Diffs { get; }
+    [PublicAPI]
+    public IReadOnlyCollection<DiffLine> Diffs { [PublicAPI] get; }
 
     /// <summary>
     ///     Contextual lines which do not introduce new content.
@@ -29,7 +33,8 @@ public readonly struct ReadOnlyPatch
     ///     they both provide context for the location of the patch in the
     ///     original text.
     /// </remarks>
-    public IReadOnlyCollection<string> ContextLines { get; }
+    [PublicAPI]
+    public IReadOnlyCollection<string> ContextLines { [PublicAPI] get; }
 
     /// <summary>
     ///     Lines which should be present in the modified text.
@@ -37,30 +42,36 @@ public readonly struct ReadOnlyPatch
     /// <remarks>
     ///     This includes both unmodified (EQUALS) and added (INSERT) lines.
     /// </remarks>
-    public IReadOnlyCollection<string> PatchedLines { get; }
+    [PublicAPI]
+    public IReadOnlyCollection<string> PatchedLines { [PublicAPI] get; }
 
     /// <summary>
     ///     The range of the first text.
     /// </summary>
-    public LineRange Range1 { get; init; }
+    [PublicAPI]
+    public LineRange Range1 { [PublicAPI] get; [PublicAPI] init; }
 
     /// <summary>
     ///     The range of the second text.
     /// </summary>
-    public LineRange Range2 { get; init; }
+    [PublicAPI]
+    public LineRange Range2 { [PublicAPI] get; [PublicAPI] init; }
 
     /// <summary>
     ///     The trimmed range of the first text, keeping only meaningful
     ///     information.
     /// </summary>
-    public LineRange TrimmedRange1 { get; }
+    [PublicAPI]
+    public LineRange TrimmedRange1 { [PublicAPI] get; }
 
     /// <summary>
     ///     The trimmed range of the second text, keeping only meaningful
     ///     information.
     /// </summary>
-    public LineRange TrimmedRange2 { get; }
+    [PublicAPI]
+    public LineRange TrimmedRange2 { [PublicAPI] get; }
 
+    [PublicAPI]
     public ReadOnlyPatch(Patch patch)
     {
         // Ensure lengths are recalculated.
@@ -84,6 +95,7 @@ public readonly struct ReadOnlyPatch
         TrimmedRange2 = Patch.TrimRange(Range2, patch.Diffs);
     }
 
+    [PublicAPI]
     public Patch CreateMutable()
     {
         return new Patch(Diffs.ToList())

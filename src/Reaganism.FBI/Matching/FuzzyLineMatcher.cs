@@ -2,19 +2,26 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using JetBrains.Annotations;
+
 using Reaganism.FBI.Diffing;
-using Reaganism.FBI.Extensions;
+using Reaganism.FBI.Utilities.Extensions;
 
 namespace Reaganism.FBI.Matching;
 
+[PublicAPI]
 public sealed class FuzzyLineMatcher
 {
+    [PublicAPI]
     public const float DEFAULT_MIN_MATCH_SCORE = 0.5f;
 
-    public int MaxMatchOffset { get; set; } = MatchMatrix.DEFAULT_MAX_OFFSET;
+    [PublicAPI]
+    public int MaxMatchOffset { [PublicAPI] get; [PublicAPI] set; } = MatchMatrix.DEFAULT_MAX_OFFSET;
 
-    public float MinMatchScore { get; set; } = DEFAULT_MIN_MATCH_SCORE;
+    [PublicAPI]
+    public float MinMatchScore { [PublicAPI] get; [PublicAPI] set; } = DEFAULT_MIN_MATCH_SCORE;
 
+    [PublicAPI]
     public void MatchLinesByWords(int[] matches, IReadOnlyList<string> wmLines1, IReadOnlyList<string> wmLines2)
     {
         foreach (var (range1, range2) in LineMatching.UnmatchedRanges(matches, wmLines2.Count))
@@ -35,6 +42,7 @@ public sealed class FuzzyLineMatcher
         }
     }
 
+    [PublicAPI]
     public int[] Match(IReadOnlyList<string> pattern, IReadOnlyList<string> search)
     {
         if (search.Count < pattern.Count)
@@ -82,6 +90,7 @@ public sealed class FuzzyLineMatcher
     }
 
     // Assumes the lines are in word-to-char mode.
+    [PublicAPI]
     public static float MatchLines(string s, string t)
     {
         var d = LevenshteinDistance(s, t);
@@ -95,7 +104,7 @@ public sealed class FuzzyLineMatcher
         return Math.Max(0f, 1f - d / max);
     }
 
-    public static int LevenshteinDistance(string s, string t)
+    private static int LevenshteinDistance(string s, string t)
     {
         // Degenerate cases.
         if (s == t)

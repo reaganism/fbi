@@ -1,7 +1,10 @@
 using System.Collections.Generic;
 
+using JetBrains.Annotations;
+
 namespace Reaganism.FBI.Matching;
 
+[PublicAPI]
 public sealed class MatchMatrix
 {
     private sealed class MatchNodes
@@ -69,9 +72,11 @@ public sealed class MatchMatrix
         }
     }
 
+    [PublicAPI]
     public const int DEFAULT_MAX_OFFSET = 5;
 
-    public LineRange WorkingRange { get; }
+    [PublicAPI]
+    public LineRange WorkingRange { [PublicAPI] get; }
 
     private readonly int       patternLength;
     private readonly LineRange range;
@@ -97,6 +102,7 @@ public sealed class MatchMatrix
 
     private int firstNode;
 
+    [PublicAPI]
     public MatchMatrix(
         IReadOnlyList<string> pattern,
         IReadOnlyList<string> search,
@@ -121,6 +127,7 @@ public sealed class MatchMatrix
         }
     }
 
+    [PublicAPI]
     public bool Match(int loc, out float score)
     {
         score = 0f;
@@ -262,6 +269,7 @@ public sealed class MatchMatrix
     ///     An array of corresponding line numbers in search text for each
     ///     line in the pattern.
     /// </returns>
+    [PublicAPI]
     public int[] Path()
     {
         var path = new int[patternLength];
@@ -300,28 +308,6 @@ public sealed class MatchMatrix
     {
         return range.Contains(loc) ? loc : -1;
     }
-
-    /*public string Visualize()
-        {
-            var path = Path();
-            var sb   = new StringBuilder();
-            for (var j = 0; j <= maxOffset; j++)
-            {
-                sb.Append(j).Append(':');
-                var line = matches[j];
-                for (var i = 0; i < patternLength; i++)
-                {
-                    var inPath = path[i] > 0 && path[i] == pos + i + j;
-                    sb.Append(inPath ? '[' : ' ');
-                    var score = (int)Math.Round(line.Nodes[i].Score * 100);
-                    sb.Append(score == 100 ? "%%" : score.ToString("D2"));
-                    sb.Append(inPath ? ']' : ' ');
-                }
-                sb.AppendLine();
-            }
-
-            return sb.ToString();
-        }*/
 
     /// <summary>
     ///     Returns the pattern distance between two successive nodes in a

@@ -1,5 +1,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+
+using JetBrains.Annotations;
 
 namespace Reaganism.FBI;
 
@@ -13,21 +16,21 @@ namespace Reaganism.FBI;
 ///     class.
 /// </remarks>
 /// <seealso cref="ReadOnlyPatch"/>
-public sealed class Patch
+[PublicAPI]
+public sealed partial class Patch
 {
     /// <summary>
     ///     The diffs this patch collates.
     /// </summary>
-    public List<DiffLine> Diffs { get; private set; }
+    [PublicAPI]
+    public List<DiffLine> Diffs { [PublicAPI] get; private set; }
 
     internal int Start1;
     internal int Start2;
     internal int Length1;
     internal int Length2;
 
-    private static readonly Dictionary<int, string> auto_headers = [];
-    private static readonly Dictionary<int, string> headers      = [];
-
+    [PublicAPI]
     public Patch(List<DiffLine>? diffLines = null)
     {
         Diffs = diffLines ?? [];
@@ -35,9 +38,8 @@ public sealed class Patch
 
     private Patch(Patch other)
     {
-        // Shallow-clone the diffs; we don't need to reinitialize since they're
-        // structs.
-        Diffs = [..other.Diffs];
+        // Shallow-clone so we don't keep a reference.
+        Diffs = other.Diffs.ToList();
 
         Start1  = other.Start1;
         Start2  = other.Start2;
@@ -45,10 +47,31 @@ public sealed class Patch
         Length2 = other.Length2;
     }
 
+    internal Patch RecalculateLength()
+    {
+        Length1 = Diffs.Count;
+        Length2 = Diffs.Count;
+
+        foreach (var diff in Diffs)
+        {
+            if (diff.Operation == Operation.INSERT)
+            {
+                Length1--;
+            }
+            else if (diff.Operation == Operation.DELETE)
+            {
+                Length2--;
+            }
+        }
+
+        return this;
+    }
+
     /// <summary>
     ///     Trims the ranges of this patch to the given context line count.
     /// </summary>
     /// <param name="contextLineCount">The amount of context lines.</param>
+    [PublicAPI]
     public Patch Trim(int contextLineCount)
     {
         var range = TrimRange(new LineRange(0, Diffs.Count), Diffs);
@@ -93,6 +116,7 @@ public sealed class Patch
     ///     replaced with another four lines, but the patch is represented as
     ///     <c>-+-+-+-+</c> when it could be <c>----++++</c>.
     /// </remarks>
+    [PublicAPI]
     public void Uncollate()
     {
         // The uncollated list is our processed list of diffs.  This method does
@@ -158,6 +182,7 @@ public sealed class Patch
     ///     A collection of patches that are the result of splitting the current
     ///     patch.
     /// </returns>
+    [PublicAPI]
     public IEnumerable<Patch> Split(int contextLineCount)
     {
         // We can short-circuit if there are no diffs.
@@ -220,76 +245,6 @@ public sealed class Patch
         }
 
         return patches;
-    }
-
-    /// <summary>
-    ///     Creates a <see cref="ReadOnlyPatch"/> derived from the current state
-    ///     of this patch.
-    /// </summary>
-    /// <returns>The read-only patch with extra information.</returns>
-    public ReadOnlyPatch AsReadOnly()
-    {
-        return new ReadOnlyPatch(this);
-    }
-
-    /// <summary>
-    ///     Clones this patch.
-    /// </summary>
-    /// <returns>
-    ///     A new <see cref="Patch"/> instance with the same data but without
-    ///     any references to the original.
-    /// </returns>
-    public Patch Clone()
-    {
-        return new Patch(this);
-    }
-
-    internal Patch RecalculateLength()
-    {
-        Length1 = Diffs.Count;
-        Length2 = Diffs.Count;
-
-        foreach (var diff in Diffs)
-        {
-            if (diff.Operation == Operation.INSERT)
-            {
-                Length1--;
-            }
-            else if (diff.Operation == Operation.DELETE)
-            {
-                Length2--;
-            }
-        }
-
-        return this;
-    }
-
-    /// <summary>
-    ///     Gets a cached header for the given ranges.
-    /// </summary>
-    /// <param name="range1">The first (DELETE) range.</param>
-    /// <param name="range2">The second (INSERT) range.</param>
-    /// <param name="auto">
-    ///     Whether insertion offsets should be automatically detected (ergo not
-    ///     specified).
-    /// </param>
-    /// <returns>The header.</returns>
-    public static string GetHeader(LineRange range1, LineRange range2, bool auto)
-    {
-        var map  = auto ? auto_headers : headers;
-        var hash = range1.GetHashCode() ^ range2.GetHashCode();
-
-        if (map.TryGetValue(hash, out var header))
-        {
-            return header;
-        }
-
-        if (auto)
-        {
-            return map[hash] = $"@@ -{range1.Start + 1},{range1.Length} +_,{range2.Length} @@";
-        }
-
-        return map[hash] = $"@@ -{range1.Start + 1},{range1.Length} +{range2.Start + 1},{range2.Length} @@";
     }
 
     /// <summary>

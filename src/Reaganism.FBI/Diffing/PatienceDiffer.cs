@@ -1,8 +1,11 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 
+using JetBrains.Annotations;
+
 namespace Reaganism.FBI.Diffing;
 
+[PublicAPI]
 public class PatienceDiffer(TokenMapper? tokenMapper = null) : IDiffer
 {
     private sealed class PatienceMatch
@@ -221,11 +224,13 @@ public class PatienceDiffer(TokenMapper? tokenMapper = null) : IDiffer
         }
     }
 
-    public TokenMapper TokenMapper { get; } = tokenMapper ?? new TokenMapper();
+    [PublicAPI]
+    public TokenMapper TokenMapper { [PublicAPI] get; } = tokenMapper ?? new TokenMapper();
 
     private string? lineModeString1;
     private string? lineModeString2;
 
+    [PublicAPI]
     public virtual int[] Match(IReadOnlyCollection<string> originalLines, IReadOnlyCollection<string> modifiedLines)
     {
         lineModeString1 = TokenMapper.LinesToIds(originalLines);

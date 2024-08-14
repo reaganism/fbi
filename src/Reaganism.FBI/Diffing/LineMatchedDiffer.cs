@@ -1,20 +1,26 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using JetBrains.Annotations;
+
 using Reaganism.FBI.Matching;
 
 namespace Reaganism.FBI.Diffing;
 
+[PublicAPI]
 public class LineMatchedDiffer(TokenMapper? tokenMapper = null) : PatienceDiffer(tokenMapper)
 {
     private string[]? WordModeLines1 { get; set; }
 
     private string[]? WordModeLines2 { get; set; }
 
-    public int MaxMatchOffset { get; set; }
+    [PublicAPI]
+    public int MaxMatchOffset { [PublicAPI] get; [PublicAPI] set; }
 
-    public float MinMatchScore { get; set; }
+    [PublicAPI]
+    public float MinMatchScore { [PublicAPI] get; [PublicAPI] set; }
 
+    [PublicAPI]
     public override int[] Match(IReadOnlyCollection<string> originalLines, IReadOnlyCollection<string> modifiedLines)
     {
         var matches = base.Match(originalLines, modifiedLines);

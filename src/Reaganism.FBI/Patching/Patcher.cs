@@ -3,29 +3,39 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
+using JetBrains.Annotations;
+
 using Reaganism.FBI.Diffing;
 using Reaganism.FBI.Matching;
 
 namespace Reaganism.FBI.Patching;
 
+[PublicAPI]
 public sealed class Patcher
 {
+    [PublicAPI]
     public enum Mode
     {
+        [PublicAPI]
         Exact,
+
+        [PublicAPI]
         Offset,
+
+        [PublicAPI]
         Fuzzy,
     }
 
-    public sealed class Result(ReadOnlyPatch patch)
+    // TODO: Make public again once API is revised!
+    private sealed class Result(ReadOnlyPatch patch)
     {
-        public ReadOnlyPatch Patch { get; } = patch;
+        private ReadOnlyPatch Patch { get; } = patch;
 
-        public bool Success { get; set; }
+        public bool Success { get; init; }
 
-        public Mode Mode { get; set; }
+        public Mode Mode { get; init; }
 
-        public int SearchOffset { get; set; }
+        // public int SearchOffset { get; set; }
 
         public ReadOnlyPatch? AppliedPatch { get; set; }
 
@@ -35,9 +45,10 @@ public sealed class Patcher
 
         public float FuzzyQuality { get; set; }
 
+        [PublicAPI] // Pretend it's used for now.
         public string Summary()
         {
-            var header = FBI.Patch.GetHeader(Patch.Range1, Patch.Range2, false);
+            var header = FBI.Patch.GetHeader(Patch, false);
 
             if (!Success)
             {
@@ -64,21 +75,22 @@ public sealed class Patcher
         }
     }
 
+    // TODO: Revise entire Patcher API; remove/refactor all of this.
     private sealed class WorkingPatch(ReadOnlyPatch patch)
     {
-        public ReadOnlyPatch Patch { get; set; } = patch;
+        public ReadOnlyPatch Patch { get; } = patch;
 
-        public Result? Result { get; set; }
+        public Result? Result { get; private set; }
 
-        public string? LmContext { get; set; }
+        public string? LmContext { get; private set; }
 
-        public string? LmPatched { get; set; }
+        public string? LmPatched { get; private set; }
 
-        public string[]? WmContext { get; set; }
+        public string[]? WmContext { get; private set; }
 
-        public string[]? WmPatched { get; set; }
+        public string[]? WmPatched { get; private set; }
 
-        public LineRange? KeepOutRange1 => Result?.AppliedPatch?.TrimmedRange1;
+        // public LineRange? KeepOutRange1 => Result?.AppliedPatch?.TrimmedRange1;
 
         public LineRange? KeepOutRange2 => Result?.AppliedPatch?.TrimmedRange2;
 
@@ -122,7 +134,7 @@ public sealed class Patcher
         public void LinesToIds(TokenMapper tokenMapper)
         {
             LmContext = tokenMapper.LinesToIds(Patch.ContextLines);
-            LmContext = tokenMapper.LinesToIds(Patch.PatchedLines);
+            LmPatched = tokenMapper.LinesToIds(Patch.PatchedLines);
         }
 
         public void WordsToIds(TokenMapper tokenMapper)
@@ -132,37 +144,14 @@ public sealed class Patcher
         }
     }
 
-    public class FuzzyMatchOptions
+    private struct MatchRunner(int loc, int dir, MatchMatrix[] mms, float penaltyPerLine)
     {
-        public int MaxMatchOffset { get; set; } = MatchMatrix.DEFAULT_MAX_OFFSET;
+        private int       loc    = loc;
+        private LineRange active = new(); // Used as a Range/Slice for the MM array.
 
-        public float MinMatchScore { get; set; } = FuzzyLineMatcher.DEFAULT_MIN_MATCH_SCORE;
-
-        public bool EnableDistancePenalty { get; set; } = true;
-    }
-
-    private struct MatchRunner
-    {
-        private readonly int           dir;
-        private readonly MatchMatrix[] mms;
-        private readonly float         penaltyPerLine;
-
-        private int       loc;
-        private LineRange active; // Used as a Range/Slice for the MM array.
-        private float     penalty;
-
-        public MatchRunner(int loc, int dir, MatchMatrix[] mms, float penaltyPerLine)
-        {
-            this.loc            = loc;
-            this.dir            = dir;
-            this.mms            = mms;
-            this.penaltyPerLine = penaltyPerLine;
-            active              = new LineRange();
-
-            // Start penalty at -10% to give some room for finding the best
-            // match if it's not "too far".
-            penalty = -0.1f;
-        }
+        // Start penalty at -10% to give some room for finding the best
+        // match if it's not "too far".
+        private float penalty = -0.1f;
 
         public bool Step(ref float bestScore, ref int[]? bestMatch)
         {
@@ -213,18 +202,36 @@ public sealed class Patcher
         }
     }
 
-    public string[] ResultLines => lines.ToArray();
+    [PublicAPI]
+    public class FuzzyMatchOptions
+    {
+        [PublicAPI]
+        public int MaxMatchOffset { [PublicAPI] get; [PublicAPI] set; } = MatchMatrix.DEFAULT_MAX_OFFSET;
 
-    public IEnumerable<Result?> Results => patches.Select(x => x.Result);
+        [PublicAPI]
+        public float MinMatchScore { [PublicAPI] get; [PublicAPI] set; } = FuzzyLineMatcher.DEFAULT_MIN_MATCH_SCORE;
 
-    public FuzzyMatchOptions FuzzyOptions { get; set; } = new();
+        [PublicAPI]
+        public bool EnableDistancePenalty { [PublicAPI] get; [PublicAPI] set; } = true;
+    }
+
+    // private IEnumerable<Result?> Results => patches.Select(x => x.Result);
+
+    [PublicAPI]
+    public string[] ResultLines
+    {
+        [PublicAPI] get => lines.ToArray();
+    }
+
+    [PublicAPI]
+    public FuzzyMatchOptions FuzzyOptions { [PublicAPI] get; [PublicAPI] set; } = new();
 
     private LineRange ModifiedRange => new(0, lastAppliedPatch?.TrimmedRange2.End ?? 0);
 
     private readonly IReadOnlyList<WorkingPatch> patches;
     private readonly TokenMapper                 tokenMapper;
+    private readonly List<string>                lines;
 
-    private List<string>  lines;
     private bool          applied;
     private string?       lmText;
     private List<string>? wmLines;
@@ -240,6 +247,7 @@ public sealed class Patcher
     // we subtract its length delta from the search offset.
     private int searchOffset;
 
+    [PublicAPI]
     public Patcher(IEnumerable<ReadOnlyPatch> patches, IEnumerable<string> lines, TokenMapper? tokenMapper = null)
     {
         this.patches     = patches.Select(x => new WorkingPatch(x)).ToList();
@@ -247,6 +255,7 @@ public sealed class Patcher
         this.tokenMapper = tokenMapper ?? new TokenMapper();
     }
 
+    [PublicAPI]
     public void Patch(Mode mode)
     {
         if (applied)
@@ -274,8 +283,8 @@ public sealed class Patcher
             }
 
             patch.Fail();
-            patch.Result!.SearchOffset =  searchOffset;
-            searchOffset               -= patch.Patch.Range2.Length - patch.Patch.Range1.Length;
+            // patch.Result!.SearchOffset = searchOffset;
+            searchOffset -= patch.Patch.Range2.Length - patch.Patch.Range1.Length;
         }
     }
 
@@ -496,7 +505,7 @@ public sealed class Patcher
 
     private static (int[]? match, float score) FuzzyMatch(IReadOnlyList<string> wmPattern, IReadOnlyList<string> wmText, int loc, FuzzyMatchOptions? options = null, LineRange[]? ranges = null)
     {
-        ranges ??= [new LineRange(0, wmText.Count)];
+        ranges  ??= [new LineRange(0, wmText.Count)];
         options ??= new FuzzyMatchOptions();
 
         // We're creating twice as many MatchMatrix objects as we need,
@@ -558,8 +567,8 @@ public sealed class Patcher
             }
             else
             {
-                // Update context to match target file (may be the same, doesn't
-                // matter).
+                // Update context to match target file (might be the same,
+                // doesn't matter).
                 diffs[j] = new DiffLine(diffs[j].Operation, lines[mLoc]);
                 j++;
             }

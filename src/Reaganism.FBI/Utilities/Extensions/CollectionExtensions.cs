@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Reaganism.FBI.Extensions;
+namespace Reaganism.FBI.Utilities.Extensions;
 
 internal static class CollectionExtensions
 {

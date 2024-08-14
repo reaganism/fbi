@@ -35,7 +35,7 @@ internal static class LineMatching
         while (start1 < len1 || start2 < len2);
     }
 
-    public static IEnumerable<(LineRange, LineRange)> UnmatchedRanges(IEnumerable<Patch> patches)
+    private static IEnumerable<(LineRange, LineRange)> UnmatchedRanges(IEnumerable<Patch> patches)
     {
         foreach (var patch in patches)
         {
@@ -78,7 +78,7 @@ internal static class LineMatching
         }
     }
 
-    public static int[] FromUnmatchedRanges(IEnumerable<(LineRange, LineRange)> unmatchedRanges, int len1)
+    private static int[] FromUnmatchedRanges(IEnumerable<(LineRange, LineRange)> unmatchedRanges, int len1)
     {
         var matches = new int[len1];
         var start1  = 0;
