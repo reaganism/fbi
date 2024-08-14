@@ -104,7 +104,25 @@ Reaganism.FBI.Patching.Patcher.Mode.Fuzzy = 2 -> Reaganism.FBI.Patching.Patcher.
 Reaganism.FBI.Patching.Patcher.Mode.Offset = 1 -> Reaganism.FBI.Patching.Patcher.Mode
 Reaganism.FBI.Patching.Patcher.Patch(Reaganism.FBI.Patching.Patcher.Mode mode) -> void
 Reaganism.FBI.Patching.Patcher.Patcher(System.Collections.Generic.IEnumerable<Reaganism.FBI.ReadOnlyPatch>! patches, System.Collections.Generic.IEnumerable<string!>! lines, Reaganism.FBI.Diffing.TokenMapper? tokenMapper = null) -> void
+Reaganism.FBI.Patching.Patcher.Result
+Reaganism.FBI.Patching.Patcher.Result.AppliedPatch.get -> Reaganism.FBI.ReadOnlyPatch?
+Reaganism.FBI.Patching.Patcher.Result.AppliedPatch.set -> void
+Reaganism.FBI.Patching.Patcher.Result.FuzzyQuality.get -> float
+Reaganism.FBI.Patching.Patcher.Result.FuzzyQuality.set -> void
+Reaganism.FBI.Patching.Patcher.Result.Mode.get -> Reaganism.FBI.Patching.Patcher.Mode
+Reaganism.FBI.Patching.Patcher.Result.Mode.init -> void
+Reaganism.FBI.Patching.Patcher.Result.Offset.get -> int
+Reaganism.FBI.Patching.Patcher.Result.Offset.set -> void
+Reaganism.FBI.Patching.Patcher.Result.OffsetWarning.get -> bool
+Reaganism.FBI.Patching.Patcher.Result.OffsetWarning.set -> void
+Reaganism.FBI.Patching.Patcher.Result.Result(Reaganism.FBI.ReadOnlyPatch patch) -> void
+Reaganism.FBI.Patching.Patcher.Result.SearchOffset.get -> int
+Reaganism.FBI.Patching.Patcher.Result.SearchOffset.set -> void
+Reaganism.FBI.Patching.Patcher.Result.Success.get -> bool
+Reaganism.FBI.Patching.Patcher.Result.Success.init -> void
+Reaganism.FBI.Patching.Patcher.Result.Summary() -> string!
 Reaganism.FBI.Patching.Patcher.ResultLines.get -> string![]!
+Reaganism.FBI.Patching.Patcher.Results.get -> System.Collections.Generic.IEnumerable<Reaganism.FBI.Patching.Patcher.Result?>!
 Reaganism.FBI.ReadOnlyPatch
 Reaganism.FBI.ReadOnlyPatch.ContextLines.get -> System.Collections.Generic.IReadOnlyCollection<string!>!
 Reaganism.FBI.ReadOnlyPatch.CreateMutable() -> Reaganism.FBI.Patch!

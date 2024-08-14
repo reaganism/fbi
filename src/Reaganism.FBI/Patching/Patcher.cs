@@ -26,26 +26,33 @@ public sealed class Patcher
         Fuzzy,
     }
 
-    // TODO: Make public again once API is revised!
-    private sealed class Result(ReadOnlyPatch patch)
+    [PublicAPI]
+    public sealed class Result(ReadOnlyPatch patch)
     {
         private ReadOnlyPatch Patch { get; } = patch;
 
-        public bool Success { get; init; }
+        [PublicAPI]
+        public bool Success { [PublicAPI] get; [PublicAPI] init; }
 
-        public Mode Mode { get; init; }
+        [PublicAPI]
+        public Mode Mode { [PublicAPI] get; [PublicAPI] init; }
 
-        // public int SearchOffset { get; set; }
+        [PublicAPI]
+        public int SearchOffset { [PublicAPI] get; [PublicAPI] set; }
 
-        public ReadOnlyPatch? AppliedPatch { get; set; }
+        [PublicAPI]
+        public ReadOnlyPatch? AppliedPatch { [PublicAPI] get; [PublicAPI] set; }
 
-        public int Offset { get; set; }
+        [PublicAPI]
+        public int Offset { [PublicAPI] get; [PublicAPI] set; }
 
-        public bool OffsetWarning { get; set; }
+        [PublicAPI]
+        public bool OffsetWarning { [PublicAPI] get; [PublicAPI] set; }
 
-        public float FuzzyQuality { get; set; }
+        [PublicAPI]
+        public float FuzzyQuality { [PublicAPI] get; [PublicAPI] set; }
 
-        [PublicAPI] // Pretend it's used for now.
+        [PublicAPI]
         public string Summary()
         {
             var header = FBI.Patch.GetHeader(Patch, false);
@@ -215,7 +222,11 @@ public sealed class Patcher
         public bool EnableDistancePenalty { [PublicAPI] get; [PublicAPI] set; } = true;
     }
 
-    // private IEnumerable<Result?> Results => patches.Select(x => x.Result);
+    [PublicAPI]
+    public IEnumerable<Result?> Results
+    {
+        [PublicAPI] get => patches.Select(x => x.Result);
+    }
 
     [PublicAPI]
     public string[] ResultLines
@@ -283,7 +294,7 @@ public sealed class Patcher
             }
 
             patch.Fail();
-            // patch.Result!.SearchOffset = searchOffset;
+            patch.Result!.SearchOffset = searchOffset;
             searchOffset -= patch.Patch.Range2.Length - patch.Patch.Range1.Length;
         }
     }
