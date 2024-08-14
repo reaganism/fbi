@@ -155,7 +155,7 @@ public class PatienceDiffer(TokenMapper? tokenMapper = null) : IDiffer
                     common2.Add(unique2[i]);
                 }
 
-                unique1[1] = unique2[i] = -1;
+                unique1[i] = unique2[i] = -1;
             }
 
             subChars.Clear();

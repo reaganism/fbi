@@ -15,20 +15,20 @@ public sealed class TokenMapper
     [PublicAPI]
     public int MaxLineId
     {
-        [PublicAPI] get => lineToString.Count;
+        [PublicAPI] get => idToLine.Count;
     }
 
     [PublicAPI]
     public int MaxWordId
     {
-        [PublicAPI] get => wordToString.Count;
+        [PublicAPI] get => idToWord.Count;
     }
 
-    private readonly List<string>               lineToString = [];
-    private readonly Dictionary<string, ushort> stringToLine = new();
+    private readonly List<string>               idToLine = [];
+    private readonly Dictionary<string, ushort> lineToId = new();
 
-    private readonly List<string>               wordToString = [];
-    private readonly Dictionary<string, ushort> stringToWord = new();
+    private readonly List<string>               idToWord = [];
+    private readonly Dictionary<string, ushort> wordToId = new();
 
     private char[] buf = new char[4096];
 
@@ -36,12 +36,12 @@ public sealed class TokenMapper
     public TokenMapper()
     {
         // Add a sentinel value at index 0.
-        lineToString.Add("\0");
+        idToLine.Add("\0");
 
         // Add ASCII characters as-is.
         for (var i = 0; i < 0x80; i++)
         {
-            wordToString.Add(((char)i).ToString());
+            idToWord.Add(((char)i).ToString());
         }
     }
 
@@ -53,13 +53,13 @@ public sealed class TokenMapper
     [PublicAPI]
     public ushort AddLine(string line)
     {
-        if (stringToLine.TryGetValue(line, out var id))
+        if (lineToId.TryGetValue(line, out var id))
         {
             return id;
         }
 
-        stringToLine.Add(line, id = (ushort)lineToString.Count);
-        lineToString.Add(line);
+        lineToId.Add(line, id = (ushort)idToLine.Count);
+        idToLine.Add(line);
         return id;
     }
 
@@ -77,13 +77,13 @@ public sealed class TokenMapper
             return word[0];
         }
 
-        if (stringToWord.TryGetValue(word, out var id))
+        if (wordToId.TryGetValue(word, out var id))
         {
             return id;
         }
 
-        stringToWord.Add(word, id = (ushort)wordToString.Count);
-        wordToString.Add(word);
+        wordToId.Add(word, id = (ushort)idToWord.Count);
+        idToWord.Add(word);
         return id;
     }
 
@@ -132,7 +132,7 @@ public sealed class TokenMapper
     [PublicAPI]
     public string GetWord(ushort id)
     {
-        return wordToString[id];
+        return idToWord[id];
     }
 
     /// <summary>
