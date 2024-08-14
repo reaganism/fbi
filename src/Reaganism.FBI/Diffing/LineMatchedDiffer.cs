@@ -15,10 +15,10 @@ public class LineMatchedDiffer(TokenMapper? tokenMapper = null) : PatienceDiffer
     private string[]? WordModeLines2 { get; set; }
 
     [PublicAPI]
-    public int MaxMatchOffset { [PublicAPI] get; [PublicAPI] set; }
+    public int MaxMatchOffset { [PublicAPI] get; [PublicAPI] set; } = MatchMatrix.DEFAULT_MAX_OFFSET;
 
     [PublicAPI]
-    public float MinMatchScore { [PublicAPI] get; [PublicAPI] set; }
+    public float MinMatchScore { [PublicAPI] get; [PublicAPI] set; } = FuzzyLineMatcher.DEFAULT_MIN_MATCH_SCORE;
 
     [PublicAPI]
     public override int[] Match(IReadOnlyCollection<string> originalLines, IReadOnlyCollection<string> modifiedLines)

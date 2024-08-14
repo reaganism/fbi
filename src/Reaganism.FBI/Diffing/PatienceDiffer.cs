@@ -80,7 +80,7 @@ public class PatienceDiffer(TokenMapper? tokenMapper = null) : IDiffer
             // No lines on a side.                  Either a 1-2 or 2-1 which
             //                                      would've been matched by
             //                                      steps 1 and 2.
-            if (start1 == end1 || start2 == end2 || end1 - start1 + end2 - start2 < 3)
+            if (start1 == end1 || start2 == end2 || end1 - start1 + end2 - start2 <= 3)
             {
                 return;
             }
@@ -174,7 +174,7 @@ public class PatienceDiffer(TokenMapper? tokenMapper = null) : IDiffer
             }
         }
 
-        private static int[] LasIndices(IReadOnlyList<int> sequence)
+        private static int[] LasIndices(List<int> sequence)
         {
             if (sequence.Count == 0)
             {
