@@ -115,6 +115,7 @@ Reaganism.FBI.Patching.Patcher.Result.Offset.get -> int
 Reaganism.FBI.Patching.Patcher.Result.Offset.set -> void
 Reaganism.FBI.Patching.Patcher.Result.OffsetWarning.get -> bool
 Reaganism.FBI.Patching.Patcher.Result.OffsetWarning.set -> void
+Reaganism.FBI.Patching.Patcher.Result.Patch.get -> Reaganism.FBI.ReadOnlyPatch
 Reaganism.FBI.Patching.Patcher.Result.Result(Reaganism.FBI.ReadOnlyPatch patch) -> void
 Reaganism.FBI.Patching.Patcher.Result.SearchOffset.get -> int
 Reaganism.FBI.Patching.Patcher.Result.SearchOffset.set -> void

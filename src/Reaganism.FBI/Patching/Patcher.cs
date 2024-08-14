@@ -29,7 +29,8 @@ public sealed class Patcher
     [PublicAPI]
     public sealed class Result(ReadOnlyPatch patch)
     {
-        private ReadOnlyPatch Patch { get; } = patch;
+        [PublicAPI]
+        public ReadOnlyPatch Patch { [PublicAPI] get; } = patch;
 
         [PublicAPI]
         public bool Success { [PublicAPI] get; [PublicAPI] init; }
@@ -294,8 +295,8 @@ public sealed class Patcher
             }
 
             patch.Fail();
-            patch.Result!.SearchOffset = searchOffset;
-            searchOffset -= patch.Patch.Range2.Length - patch.Patch.Range1.Length;
+            patch.Result!.SearchOffset =  searchOffset;
+            searchOffset               -= patch.Patch.Range2.Length - patch.Patch.Range1.Length;
         }
     }
 
