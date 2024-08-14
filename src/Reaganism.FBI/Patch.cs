@@ -4,6 +4,8 @@ using System.Linq;
 
 using JetBrains.Annotations;
 
+using Reaganism.FBI.Utilities.Extensions;
+
 namespace Reaganism.FBI;
 
 /// <summary>
@@ -191,10 +193,6 @@ public sealed partial class Patch
             return [];
         }
 
-        // Two patches can border each other, and the farthest apart they can be
-        // is double the context line count (maximum context from either patch).
-        var contiguousContextualLineCountMax = contextLineCount * 2;
-
         var ranges = new List<LineRange>();
 
         var start        = 0;
@@ -210,9 +208,12 @@ public sealed partial class Patch
                 continue;
             }
 
-            // If we have encountered an amount of contiguous context greater
-            // than double the count, we know they need to be split.
-            if (contextCount > contiguousContextualLineCountMax)
+            // Two patches can border each other, and the farthest apart they
+            // can be is double the context line count (maximum context from
+            // either patch).  If we have encountered an amount of contiguous
+            // context greater than double the count, we know they need to be
+            // split.
+            if (contextCount > contextLineCount * 2)
             {
                 ranges.Add(new LineRange(start, i - contextCount + contextLineCount));
                 start = i - contextLineCount;
@@ -232,7 +233,7 @@ public sealed partial class Patch
         foreach (var range in ranges)
         {
             var skip = range.Start - endIndex;
-            var patch = new Patch(Diffs[range.Start..range.End])
+            var patch = new Patch(Diffs.Slice(range).ToList())
             {
                 Start1 = end1 + skip,
                 Start2 = end2 + skip,

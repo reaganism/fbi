@@ -117,7 +117,7 @@ internal static class LineMatching
         return FromUnmatchedRanges(UnmatchedRanges(patches), len1);
     }
 
-    public static List<DiffLine> MakeDiffList(int[] matches, IReadOnlyList<string> originalLines, IReadOnlyList<string> modifiedLines)
+    public static List<DiffLine> MakeDiffList(int[] matches, IReadOnlyList<string> lines1, IReadOnlyList<string> lines2)
     {
         var list = new List<DiffLine>();
 
@@ -132,36 +132,36 @@ internal static class LineMatching
 
             while (l < i)
             {
-                list.Add(new DiffLine(Operation.DELETE, originalLines[l++]));
+                list.Add(new DiffLine(Operation.DELETE, lines1[l++]));
             }
 
             while (r < matches[i])
             {
-                list.Add(new DiffLine(Operation.INSERT, modifiedLines[r++]));
+                list.Add(new DiffLine(Operation.INSERT, lines2[r++]));
             }
 
-            if (originalLines[l] != modifiedLines[r])
+            if (lines1[l] != lines2[r])
             {
-                list.Add(new DiffLine(Operation.DELETE, originalLines[l]));
-                list.Add(new DiffLine(Operation.INSERT, modifiedLines[r]));
+                list.Add(new DiffLine(Operation.DELETE, lines1[l]));
+                list.Add(new DiffLine(Operation.INSERT, lines2[r]));
             }
             else
             {
-                list.Add(new DiffLine(Operation.EQUALS, originalLines[l]));
+                list.Add(new DiffLine(Operation.EQUALS, lines1[l]));
             }
 
             l++;
             r++;
         }
 
-        while (l < originalLines.Count)
+        while (l < lines1.Count)
         {
-            list.Add(new DiffLine(Operation.DELETE, originalLines[l++]));
+            list.Add(new DiffLine(Operation.DELETE, lines1[l++]));
         }
 
-        while (r < modifiedLines.Count)
+        while (r < lines2.Count)
         {
-            list.Add(new DiffLine(Operation.INSERT, modifiedLines[r++]));
+            list.Add(new DiffLine(Operation.INSERT, lines2[r++]));
         }
 
         return list;

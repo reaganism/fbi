@@ -74,9 +74,6 @@ public readonly struct ReadOnlyPatch
     [PublicAPI]
     public ReadOnlyPatch(Patch patch)
     {
-        // Ensure lengths are recalculated.
-        patch.RecalculateLength();
-
         // Shallow-clone the diffs; we don't need to reinitialize since they're
         // structs.  TODO(perf): It'd be nice to avoid this operation.
         Diffs = patch.Diffs.ToList();

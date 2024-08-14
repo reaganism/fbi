@@ -586,6 +586,7 @@ public sealed class Patcher
             }
         }
 
+        fuzzyPatch.RecalculateLength();
         return fuzzyPatch.AsReadOnly();
     }
 
