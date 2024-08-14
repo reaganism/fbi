@@ -90,7 +90,7 @@ public readonly record struct LineRange([PublicAPI] int Start, [PublicAPI] int E
 
         if (End - start > 0)
         {
-            yield return new LineRange(start, End);
+            yield return this with { Start = start };
         }
     }
 

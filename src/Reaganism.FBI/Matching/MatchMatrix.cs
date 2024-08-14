@@ -204,7 +204,7 @@ public sealed class MatchMatrix
         {
             var node = matches[j].Nodes[patternLength - 1];
             node.Sum  = node.Score;
-            node.Next = -1;
+            node.Next = -1; // No next.
         }
 
         // Calculate the best paths for all nodes excluding the head.
@@ -248,7 +248,7 @@ public sealed class MatchMatrix
             for (var k = 1; k <= maxOffset; k++)
             {
                 var sum = matches[k].Nodes[0].Sum;
-                if (!(sum > maxSum))
+                if (sum <= maxSum)
                 {
                     continue;
                 }

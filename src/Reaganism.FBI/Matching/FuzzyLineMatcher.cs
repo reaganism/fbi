@@ -77,7 +77,7 @@ public sealed class FuzzyLineMatcher
         var mm = new MatchMatrix(pattern, search, MaxMatchOffset);
         for (var i = mm.WorkingRange.First; mm.Match(i, out var score); i++)
         {
-            if (!(score > bestScore))
+            if (score <= bestScore)
             {
                 continue;
             }
@@ -101,7 +101,7 @@ public sealed class FuzzyLineMatcher
         }
 
         var max = Math.Max(s.Length, t.Length) / 2f;
-        return Math.Max(0f, 1f - d / max);
+        return Math.Max(0f, 1f - (d / max));
     }
 
     private static int LevenshteinDistance(string s, string t)
@@ -117,7 +117,7 @@ public sealed class FuzzyLineMatcher
             return t.Length;
         }
 
-        if (s.Length == 0)
+        if (t.Length == 0)
         {
             return s.Length;
         }

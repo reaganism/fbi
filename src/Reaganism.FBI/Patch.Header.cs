@@ -6,8 +6,8 @@ namespace Reaganism.FBI;
 
 partial class Patch
 {
-    private static readonly Dictionary<int, string> auto_headers = [];
-    private static readonly Dictionary<int, string> headers      = [];
+    private static readonly Dictionary<(LineRange, LineRange), string> auto_headers = [];
+    private static readonly Dictionary<(LineRange, LineRange), string> headers      = [];
 
     /// <summary>
     ///     Gets a cached header for the given patch.
@@ -57,18 +57,18 @@ partial class Patch
     public static string GetHeader(LineRange range1, LineRange range2, bool auto)
     {
         var map  = auto ? auto_headers : headers;
-        var hash = range1.GetHashCode() ^ range2.GetHashCode();
+        // var hash = range1.GetHashCode() ^ range2.GetHashCode();
 
-        if (map.TryGetValue(hash, out var header))
+        if (map.TryGetValue((range1, range2), out var header))
         {
             return header;
         }
 
         if (auto)
         {
-            return map[hash] = $"@@ -{range1.Start + 1},{range1.Length} +_,{range2.Length} @@";
+            return map[(range1, range2)] = $"@@ -{range1.Start + 1},{range1.Length} +_,{range2.Length} @@";
         }
 
-        return map[hash] = $"@@ -{range1.Start + 1},{range1.Length} +{range2.Start + 1},{range2.Length} @@";
+        return map[(range1, range2)] = $"@@ -{range1.Start + 1},{range1.Length} +{range2.Start + 1},{range2.Length} @@";
     }
 }
