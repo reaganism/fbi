@@ -121,7 +121,7 @@ public sealed class TokenMapper
     [PublicAPI]
     public string LinesToIds(IEnumerable<string> lines)
     {
-        return string.Join(',', lines.Select(AddLine));
+        return new string(lines.Select(AddLine).Select(x => (char)x).ToArray());
     }
 
     /// <summary>

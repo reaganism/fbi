@@ -143,7 +143,7 @@ internal static class LineMatching
             if (originalLines[l] != modifiedLines[r])
             {
                 list.Add(new DiffLine(Operation.DELETE, originalLines[l]));
-                list.Add(new DiffLine(Operation.INSERT, originalLines[r]));
+                list.Add(new DiffLine(Operation.INSERT, modifiedLines[r]));
             }
             else
             {

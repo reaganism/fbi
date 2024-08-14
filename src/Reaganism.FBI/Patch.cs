@@ -74,7 +74,7 @@ public sealed partial class Patch
     [PublicAPI]
     public Patch Trim(int contextLineCount)
     {
-        var range = TrimRange(new LineRange(0, Diffs.Count), Diffs);
+        var range = TrimRange(new LineRange(0, 0).WithLength(Diffs.Count), Diffs);
 
         if (range.Length == 0)
         {
@@ -232,7 +232,7 @@ public sealed partial class Patch
         foreach (var range in ranges)
         {
             var skip = range.Start - endIndex;
-            var patch = new Patch(Diffs[range.Start..range.Length])
+            var patch = new Patch(Diffs[range.Start..range.End])
             {
                 Start1 = end1 + skip,
                 Start2 = end2 + skip,
@@ -272,7 +272,7 @@ public sealed partial class Patch
         }
 
         // Now that we've located the start, we need to determine the end.
-        var end = 0;
+        var end = diffs.Count;
         while (end > start && diffs[end - 1].Operation == Operation.EQUALS)
         {
             end--;
@@ -280,6 +280,6 @@ public sealed partial class Patch
 
         // Our new line range includes the offsets we've calculated to remove
         // any unnecessary context.
-        return new LineRange(range.Start + start, range.Length - (diffs.Count - end));
+        return new LineRange(range.Start + start, range.End - (diffs.Count - end));
     }
 }
