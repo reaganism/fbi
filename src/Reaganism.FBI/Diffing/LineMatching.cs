@@ -27,10 +27,12 @@ internal static class LineMatching
                 start1 = end1;
                 start2 = end2;
             }
-
-            // Matchpoint follows on from the start, no unmatched lines.
-            start1++;
-            start2++;
+            else
+            {
+                // Matchpoint follows on from the start, no unmatched lines.
+                start1++;
+                start2++;
+            }
         }
         while (start1 < len1 || start2 < len2);
     }
@@ -93,7 +95,7 @@ internal static class LineMatching
 
             if (start2 != range2.Start)
             {
-                throw new InvalidOperationException("Unequal n umber of lines between unmatched ranges on each side.");
+                throw new InvalidOperationException("Unequal number of lines between unmatched ranges on each side.");
             }
 
             while (start1 < range1.End)
