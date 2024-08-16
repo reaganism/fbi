@@ -110,7 +110,7 @@ public sealed class TokenMapper
             buf[b++] = (char)AddWord(word);
         }
 
-        return string.Join(',', buf.Take(b));
+        return new string(buf, 0, b);
     }
 
     /// <summary>
