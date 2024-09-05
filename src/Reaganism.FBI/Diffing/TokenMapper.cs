@@ -24,7 +24,7 @@ public sealed class TokenMapper
         [PublicAPI] get => idToWord.Count;
     }
 
-    private readonly List<string>               idToLine = [];
+    private readonly List<string>               idToLine = [..cached_lines_to_ids];
     private readonly Dictionary<string, ushort> lineToId = new();
 
     private readonly List<string>               idToWord = [];
@@ -32,16 +32,23 @@ public sealed class TokenMapper
 
     private char[] buf = new char[4096];
 
-    [PublicAPI]
-    public TokenMapper()
-    {
-        // Add a sentinel value at index 0.
-        idToLine.Add("\0");
+    private static readonly string[] cached_lines_to_ids;
 
-        // Add ASCII characters as-is.
-        for (var i = 0; i < 0x80; i++)
+    [PublicAPI]
+    public TokenMapper() { }
+
+    static TokenMapper()
+    {
+        cached_lines_to_ids = new string[0x80 + 1];
         {
-            idToWord.Add(((char)i).ToString());
+            // Add a sentinel value at index 0.
+            cached_lines_to_ids[0] = "\0";
+
+            // Add ASCII characters as-is.
+            for (var i = 0; i < 0x80; i++)
+            {
+                cached_lines_to_ids[i + 1] = ((char)i).ToString();
+            }
         }
     }
 
