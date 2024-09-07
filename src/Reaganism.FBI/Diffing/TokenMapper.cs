@@ -155,8 +155,13 @@ public sealed class TokenMapper
             var start = i;
             var c     = line[i++];
 
+            // Search for different "word" types: words, numbers, whitespace,
+            // and symbols.
             if (char.IsLetter(c))
             {
+                // If we start with a character, begin resolving an entire word.
+                // A word must start with a letter and may contain letters or
+                // digits.
                 while (i < line.Length && char.IsLetterOrDigit(line, i))
                 {
                     i++;
@@ -164,6 +169,8 @@ public sealed class TokenMapper
             }
             else if (char.IsDigit(c))
             {
+                // If we start with a digit, begin resolving an entire number.
+                // A number must start with a digit and may contain only digits.
                 while (i < line.Length && char.IsDigit(line, i))
                 {
                     i++;
@@ -171,12 +178,20 @@ public sealed class TokenMapper
             }
             else if (c is ' ' or '\t')
             {
+                // If we start with whitespace, begin resolving all contiguous
+                // whitespace characters of that type.  To maintain
+                // compatibility with Chicken-Bones/DiffPatch diffs, we only
+                // handle spaces and tabs.
                 while (i < line.Length && line[i] == c)
                 {
                     i++;
                 }
             }
 
+            // Return the resolved range.  If a character is not a supported
+            // whitespace character, a letter, or a digit, it also falls through
+            // here.  This means that symbols will consist of only a single
+            // character.
             yield return new Range(start, i);
         }
     }
