@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 using JetBrains.Annotations;
 
@@ -30,7 +32,7 @@ public sealed class TokenMapper
     private readonly List<string>               idToWord = [];
     private readonly Dictionary<string, ushort> wordToId = new();
 
-    private char[] buf = new char[4096];
+    private ushort[] buf = new ushort[4096];
 
     private static readonly string[] cached_lines_to_ids;
 
@@ -171,11 +173,11 @@ public sealed class TokenMapper
                     Array.Resize(ref buf, buf.Length * 2);
                 }
 
-                buf[b++] = (char)AddWord(word);
+                buf[b++] = AddWord(word);
             }
         }
 
-        return new string(buf, 0, b);
+        return new string(Cast<ushort, char>(new ReadOnlySpan<ushort>(buf, 0, b)));
     }
 
     /// <summary>
@@ -258,4 +260,19 @@ public sealed class TokenMapper
         }
     }
     */
+
+    // Simplified implementation of MemoryMarshal::Cast for read-only spans
+    // WITHOUT handling different sizes/lengths or ensuring types don't contain
+    // references, since we only use it for converting ushort spans to char
+    // spans, which are both blittable structs with the same size.
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static ReadOnlySpan<TTo> Cast<TFrom, TTo>(ReadOnlySpan<TFrom> span)
+        where TFrom : struct
+        where TTo : struct
+    {
+        return MemoryMarshal.CreateReadOnlySpan(
+            ref Unsafe.As<TFrom, TTo>(ref MemoryMarshal.GetReference(span)),
+            span.Length
+        );
+    }
 }
