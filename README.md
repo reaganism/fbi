@@ -15,6 +15,6 @@ This projects iterates over `DiffPatch` significantly, boasting:
   - no longer holding onto garbage references (allowing the garbage collector to better do its job and avoiding additional heap allocations);
   - minimizing unnecessary allocations by handling well-known situations (including hashing segments of strings without allocating new strings and avoiding allocations per-diff line when serializing patch files).
 - and an extremely optimized execution speed.
-  - `TokenMapper` boasts the hottest code paths, resolved in part by heavy use of caching;
+  - `TokenMapper` features the hottest code paths, resolved in part by heavy use of caching;
   - as mentioned before, string slicing is avoided in favor of hashing ranges explicitly;
   - setting knowable capacities to avoid copying.
