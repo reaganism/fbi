@@ -38,7 +38,7 @@ public sealed class TokenMapper
     private readonly List<string>            idToWord = [];
     private readonly Dictionary<int, ushort> wordToId = new();
 
-    private ushort[] buf = new ushort[4096];
+    private char[] buf = new char[4096];
 
     private static readonly string[] cached_lines_to_ids;
 
@@ -188,12 +188,11 @@ public sealed class TokenMapper
                     Array.Resize(ref buf, buf.Length * 2);
                 }
 
-                buf[b++] = AddWord(line, new SimpleRange(start, i));
+                buf[b++] = (char)AddWord(line, new SimpleRange(start, i));
             }
         }
 
-        return new string(Cast<ushort, char>(new ReadOnlySpan<ushort>(buf, 0, b)));
-        // return new string(buf, 0, b);
+        return new string(buf, 0, b);
     }
 
     /// <summary>
