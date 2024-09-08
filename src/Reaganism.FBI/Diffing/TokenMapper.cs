@@ -135,10 +135,11 @@ public sealed class TokenMapper
     [PublicAPI]
     public string WordsToIds(string line)
     {
-        var b = 0;
+        var b      = 0;
+        var length = line.Length;
 
         // Inlined from EnumerateWords (see commented declaration for reasons).
-        for (var i = 0; i < line.Length;)
+        for (var i = 0; i < length;)
         {
             var start = i;
             var c     = line[i++];
@@ -150,7 +151,7 @@ public sealed class TokenMapper
                 // If we start with a character, begin resolving an entire word.
                 // A word must start with a letter and may contain letters or
                 // digits.
-                while (i < line.Length && char.IsLetterOrDigit(line, i))
+                while (i < length && char.IsLetterOrDigit(line, i))
                 {
                     i++;
                 }
@@ -159,7 +160,7 @@ public sealed class TokenMapper
             {
                 // If we start with a digit, begin resolving an entire number.
                 // A number must start with a digit and may contain only digits.
-                while (i < line.Length && char.IsDigit(line, i))
+                while (i < length && char.IsDigit(line, i))
                 {
                     i++;
                 }
@@ -170,7 +171,7 @@ public sealed class TokenMapper
                 // whitespace characters of that type.  To maintain
                 // compatibility with Chicken-Bones/DiffPatch diffs, we only
                 // handle spaces and tabs.
-                while (i < line.Length && line[i] == c)
+                while (i < length && line[i] == c)
                 {
                     i++;
                 }
