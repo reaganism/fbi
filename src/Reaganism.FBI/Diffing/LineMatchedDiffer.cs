@@ -10,10 +10,6 @@ namespace Reaganism.FBI.Diffing;
 [PublicAPI]
 public class LineMatchedDiffer(TokenMapper? tokenMapper = null) : PatienceDiffer(tokenMapper)
 {
-    private string[]? WordModeLines1 { get; set; }
-
-    private string[]? WordModeLines2 { get; set; }
-
     [PublicAPI]
     public int MaxMatchOffset { [PublicAPI] get; [PublicAPI] set; } = MatchMatrix.DEFAULT_MAX_OFFSET;
 
@@ -24,14 +20,14 @@ public class LineMatchedDiffer(TokenMapper? tokenMapper = null) : PatienceDiffer
     public override int[] Match(IReadOnlyCollection<string> originalLines, IReadOnlyCollection<string> modifiedLines)
     {
         var matches = base.Match(originalLines, modifiedLines);
-        WordModeLines1 = originalLines.Select(TokenMapper.WordsToIds).ToArray();
-        WordModeLines2 = modifiedLines.Select(TokenMapper.WordsToIds).ToArray();
+        var wordModeLines1 = originalLines.Select(TokenMapper.WordsToIds).ToArray();
+        var wordModeLines2 = modifiedLines.Select(TokenMapper.WordsToIds).ToArray();
 
         new FuzzyLineMatcher
         {
             MinMatchScore  = MinMatchScore,
             MaxMatchOffset = MaxMatchOffset,
-        }.MatchLinesByWords(matches, WordModeLines1, WordModeLines2);
+        }.MatchLinesByWords(matches, wordModeLines1, wordModeLines2);
 
         return matches;
     }
