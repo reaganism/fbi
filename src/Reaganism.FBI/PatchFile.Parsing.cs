@@ -25,7 +25,6 @@ partial class PatchFile
     [PublicAPI]
     public static PatchFile FromText(string patchText, bool verifyHeaders = true)
     {
-        // TODO: Can we trim all whitespace and not just carriage returns?
         return FromLines(patchText.Split('\n').Select(x => x.TrimEnd('\r')), verifyHeaders);
     }
 
