@@ -1,5 +1,6 @@
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Linq;
 
 using JetBrains.Annotations;
 
@@ -8,7 +9,7 @@ namespace Reaganism.FBI.Diffing;
 [PublicAPI]
 public class PatienceDiffer(TokenMapper? tokenMapper = null) : IDiffer
 {
-    private sealed class PatienceMatch
+    private static class PatienceMatch
     {
         private class LcaNode(int value, LcaNode? previous)
         {
@@ -17,54 +18,33 @@ public class PatienceDiffer(TokenMapper? tokenMapper = null) : IDiffer
             public LcaNode? Previous { get; } = previous;
         }
 
-        private string? chars1;
-        private string? chars2;
-        private int[]?  unique1;
-        private int[]?  unique2;
-        private int[]?  matches;
-
-        private readonly List<int> subChars = [];
-
-        public int[] Match(string originalChars, string modifiedChars, int maxChar)
+        public static unsafe int[] Match(string originalChars, string modifiedChars, int maxChar)
         {
-            if (unique1 is null || unique1.Length < maxChar)
-            {
-                unique1 = new int[maxChar];
-                unique2 = new int[maxChar];
+            Span<int> unique1 = stackalloc int[maxChar];
+            Span<int> unique2 = stackalloc int[maxChar];
 
-                for (var i = 0; i < maxChar; i++)
-                {
-                    unique1[i] = unique2[i] = -1;
-                }
+            for (var i = 0; i < maxChar; i++)
+            {
+                unique1[i] = unique2[i] = -1;
             }
 
-            chars1 = originalChars;
-            chars2 = modifiedChars;
-
-            return Match();
+            return Match(unique1, unique2, originalChars, modifiedChars);
         }
 
-        private int[] Match()
+        private static int[] Match(Span<int> unique1, Span<int> unique2, string chars1, string chars2)
         {
-            Debug.Assert(chars1 is not null);
-            Debug.Assert(chars2 is not null);
-
-            matches = new int[chars1.Length];
+            var matches = new int[chars1.Length];
             for (var i = 0; i < chars1.Length; i++)
             {
                 matches[i] = -1;
             }
 
-            Match(0, chars1.Length, 0, chars2.Length);
+            Match(0, chars1.Length, 0, chars2.Length, unique1, unique2, chars1, chars2, matches);
             return matches;
         }
 
-        private void Match(int start1, int end1, int start2, int end2)
+        private static void Match(int start1, int end1, int start2, int end2, Span<int> unique1, Span<int> unique2, string chars1, string chars2, int[] matches)
         {
-            Debug.Assert(chars1 is not null);
-            Debug.Assert(chars2 is not null);
-            Debug.Assert(matches is not null);
-
             // Step 1: Match up identical starting lines.
             while (start1 < end1 && start2 < end2 && chars1[start1] == chars2[start2])
             {
@@ -87,13 +67,13 @@ public class PatienceDiffer(TokenMapper? tokenMapper = null) : IDiffer
 
             // Step 3: Match up common unique lines.
             var any = false;
-            foreach (var (m1, m2) in LcsUnique(start1, end1, start2, end2))
+            foreach (var (m1, m2) in LcsUnique(start1, end1, start2, end2, unique1, unique2, chars1, chars2))
             {
                 matches[m1] = m2;
                 any         = true;
 
                 // Step 4: Recurse.
-                Match(start1, m1, start2, m2);
+                Match(start1, m1, start2, m2, unique1, unique2, chars1, chars2, matches);
 
                 start1 = m1 + 1;
                 start2 = m2 + 1;
@@ -102,16 +82,13 @@ public class PatienceDiffer(TokenMapper? tokenMapper = null) : IDiffer
             if (any)
             {
                 // ReSharper disable once TailRecursiveCall
-                Match(start1, end1, start2, end2);
+                Match(start1, end1, start2, end2, unique1, unique2, chars1, chars2, matches);
             }
         }
 
-        private IEnumerable<(int, int)> LcsUnique(int start1, int end1, int start2, int end2)
+        private static IEnumerable<(int, int)> LcsUnique(int start1, int end1, int start2, int end2, Span<int> unique1, Span<int> unique2, string chars1, string chars2)
         {
-            Debug.Assert(chars1 is not null);
-            Debug.Assert(chars2 is not null);
-            Debug.Assert(unique1 is not null);
-            Debug.Assert(unique2 is not null);
+            var subChars = new List<int>();
 
             // Identify all the unique characters in chars1.
             for (var i = start1; i < end1; i++)
@@ -158,20 +135,12 @@ public class PatienceDiffer(TokenMapper? tokenMapper = null) : IDiffer
                 unique1[i] = unique2[i] = -1;
             }
 
-            subChars.Clear();
-
-            if (common2.Count == 0)
-            {
-                yield break;
-            }
-
             // Repose the longest common subsequence as longest ascending
             // subsequence.  Note that common2 is already sorted by order of
             // appearance in file1 by char allocation.
-            foreach (var i in LasIndices(common2))
-            {
-                yield return (common1[i], common2[i]);
-            }
+            return common2.Count == 0
+                ? []
+                : LasIndices(common2).Select(x => (common1[x], common2[x]));
         }
 
         private static int[] LasIndices(List<int> sequence)
@@ -236,6 +205,6 @@ public class PatienceDiffer(TokenMapper? tokenMapper = null) : IDiffer
         lineModeString1 = TokenMapper.LinesToIds(originalLines);
         lineModeString2 = TokenMapper.LinesToIds(modifiedLines);
 
-        return new PatienceMatch().Match(lineModeString1, lineModeString2, TokenMapper.MaxLineId);
+        return PatienceMatch.Match(lineModeString1, lineModeString2, TokenMapper.MaxLineId);
     }
 }
