@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -14,6 +15,11 @@ namespace Reaganism.FBI.Diffing;
 [PublicAPI]
 public sealed class TokenMapper
 {
+    private readonly record struct SimpleRange(int Start, int End)
+    {
+        public int Length => End - Start;
+    }
+
     [PublicAPI]
     public int MaxLineId
     {
@@ -29,8 +35,8 @@ public sealed class TokenMapper
     private readonly List<string>               idToLine = [..cached_lines_to_ids];
     private readonly Dictionary<string, ushort> lineToId = new();
 
-    private readonly List<string>               idToWord = [];
-    private readonly Dictionary<string, ushort> wordToId = new();
+    private readonly List<string>            idToWord = [];
+    private readonly Dictionary<int, ushort> wordToId = new();
 
     private ushort[] buf = new ushort[4096];
 
@@ -80,7 +86,7 @@ public sealed class TokenMapper
     [PublicAPI]
     public ushort AddWord(string word)
     {
-        if (word.Length == 1 && word[0] <= 0x80)
+        /*if (word.Length == 1 && word[0] <= 0x80)
         {
             // Use ASCII characters as-is.
             return word[0];
@@ -93,6 +99,30 @@ public sealed class TokenMapper
 
         wordToId.Add(word, id = (ushort)idToWord.Count);
         idToWord.Add(word);
+        return id;*/
+
+        return AddWord(word, new SimpleRange(0, word.Length));
+    }
+
+    private ushort AddWord(string word, SimpleRange range)
+    {
+        if (range.Length == 1 && word[0] <= 0x80)
+        {
+            // Use ASCII characters as-is.
+            return word[0];
+        }
+
+        var hash = GetSlicedStringHashCode(word, range);
+        {
+            Debug.Assert(GetSlicedStringHashCode(word, range) == word[range.Start..range.End].GetHashCode());
+        }
+        if (wordToId.TryGetValue(hash, out var id))
+        {
+            return id;
+        }
+
+        wordToId.Add(hash, id = (ushort)idToWord.Count);
+        idToWord.Add(word[range.Start..range.End]);
         return id;
     }
 
@@ -105,20 +135,6 @@ public sealed class TokenMapper
     [PublicAPI]
     public string WordsToIds(string line)
     {
-        /*var b = 0;
-
-        foreach (var r in EnumerateWords(line))
-        {
-            var word = line[r];
-
-            if (b >= buf.Length)
-            {
-                Array.Resize(ref buf, buf.Length * 2);
-            }
-
-            buf[b++] = (char)AddWord(word);
-        }*/
-
         var b = 0;
 
         // Inlined from EnumerateWords (see commented declaration for reasons).
@@ -166,18 +182,17 @@ public sealed class TokenMapper
             // character.
             // yield return new Range(start, i);
             {
-                var word = line[start..i];
-
                 if (b >= buf.Length)
                 {
                     Array.Resize(ref buf, buf.Length * 2);
                 }
 
-                buf[b++] = AddWord(word);
+                buf[b++] = AddWord(line, new SimpleRange(start, i));
             }
         }
 
         return new string(Cast<ushort, char>(new ReadOnlySpan<ushort>(buf, 0, b)));
+        // return new string(buf, 0, b);
     }
 
     /// <summary>
@@ -274,5 +289,26 @@ public sealed class TokenMapper
             ref Unsafe.As<TFrom, TTo>(ref MemoryMarshal.GetReference(span)),
             span.Length
         );
+    }
+
+    // Mirrors the .NET 8 String::GetHashCode implementation but specifically
+    // computes only the hash of a specific character range within the string.
+    // We do this to avoid needing to allocate a string instance if the value
+    // has already been previously added to a TokenMapper instance.
+    private static unsafe int GetSlicedStringHashCode(string value, SimpleRange range)
+    {
+        var seed = Marvin.DefaultSeed;
+        fixed (char* pValue = value)
+        {
+            var     pChar   = pValue + range.Start;
+            ref var charRef = ref *pChar;
+
+            return Marvin.ComputeHash32(
+                ref Unsafe.As<char, byte>(ref charRef),
+                (uint)range.Length * 2, // In bytes, not chars.
+                (uint)seed,
+                (uint)(seed >> 32)
+            );
+        }
     }
 }
