@@ -79,6 +79,7 @@ Reaganism.FBI.Patch.Patch() -> void
 Reaganism.FBI.Patch.Patch(System.Collections.Generic.List<Reaganism.FBI.DiffLine>? diffLines = null) -> void
 Reaganism.FBI.Patch.Split(int contextLineCount) -> System.Collections.Generic.IEnumerable<Reaganism.FBI.Patch>!
 Reaganism.FBI.Patch.Trim(int contextLineCount) -> Reaganism.FBI.Patch
+Reaganism.FBI.Patch.Uncollate() -> Reaganism.FBI.Patch
 Reaganism.FBI.PatchFile
 Reaganism.FBI.PatchFile.ModifiedPath.get -> string?
 Reaganism.FBI.PatchFile.ModifiedPath.set -> void
