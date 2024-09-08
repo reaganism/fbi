@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Reaganism.FBI.Matching;
 
@@ -121,7 +122,7 @@ internal static class LineMatching
 
     public static List<DiffLine> MakeDiffList(int[] matches, IReadOnlyList<string> lines1, IReadOnlyList<string> lines2)
     {
-        var list = new List<DiffLine>();
+        var list = new List<DiffLine>(Math.Max(Math.Max(matches.Length, lines1.Count), lines2.Count));
 
         var l = 0;
         var r = 0;
