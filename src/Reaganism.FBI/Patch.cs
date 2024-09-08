@@ -141,7 +141,7 @@ public readonly partial struct Patch
         return this;
     }
 
-    /*/// <summary>
+    /// <summary>
     ///     "Uncollates" the patch, cleaning up ordering so chunks of deletions
     ///     and insertions are separated and positioned properly.
     /// </summary>
@@ -151,7 +151,7 @@ public readonly partial struct Patch
     ///     <c>-+-+-+-+</c> when it could be <c>----++++</c>.
     /// </remarks>
     [PublicAPI]
-    public void Uncollate()
+    public Patch Uncollate()
     {
         // The uncollated list is our processed list of diffs.  This method does
         // not remove any diffs, it only does re-ordering to tidy up the patch.
@@ -199,8 +199,8 @@ public readonly partial struct Patch
         // Final clean-up; add any remaining insertions (it's possible that a
         // patch does not end with any context thus the chunk does not "end").
         uncollated.AddRange(insertions);
-        Diffs = uncollated;
-    }*/
+        return new Patch(uncollated);
+    }
 
     /// <summary>
     ///     Splits the current patch into multiple, smaller patches. When there

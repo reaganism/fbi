@@ -78,7 +78,7 @@ public static class Differ
 
         if (!collate)
         {
-            // patch.Uncollate();
+            patch = patch.Uncollate();
         }
 
         return patch.Split(contextLinesCount).Select(x => x.Compile());
