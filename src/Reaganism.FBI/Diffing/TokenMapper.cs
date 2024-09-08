@@ -32,10 +32,10 @@ public sealed class TokenMapper
     }
 
     private readonly List<string>               idToLine = [..cached_lines_to_ids];
-    private readonly Dictionary<string, ushort> lineToId = new();
+    private readonly Dictionary<string, ushort> lineToId = [];
 
     private readonly List<string>            idToWord = [];
-    private readonly Dictionary<int, ushort> wordToId = new();
+    private readonly Dictionary<int, ushort> wordToId = [];
 
     private readonly Dictionary<string, string> wordsToIdsCache = [];
 
