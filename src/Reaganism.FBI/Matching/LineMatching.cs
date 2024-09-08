@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Reaganism.FBI.Diffing;
+namespace Reaganism.FBI.Matching;
 
 internal static class LineMatching
 {

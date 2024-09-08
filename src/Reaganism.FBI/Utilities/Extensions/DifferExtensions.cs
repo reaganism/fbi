@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using JetBrains.Annotations;
 
 using Reaganism.FBI.Diffing;
+using Reaganism.FBI.Matching;
 
 namespace Reaganism.FBI.Utilities.Extensions;
 
