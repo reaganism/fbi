@@ -587,7 +587,7 @@ public sealed class Patcher
         }
 
         fuzzyPatch.RecalculateLength();
-        return fuzzyPatch.AsReadOnly();
+        return fuzzyPatch.Compile();
     }
 
     private static int OffsetWarnDistance(int patchLength, int fileLength)

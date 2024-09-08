@@ -81,6 +81,6 @@ public static class Differ
             patch.Uncollate();
         }
 
-        return patch.Split(contextLinesCount).Select(x => x.AsReadOnly());
+        return patch.Split(contextLinesCount).Select(x => x.Compile());
     }
 }

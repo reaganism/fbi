@@ -86,7 +86,7 @@ partial struct PatchFile
                     if (patch is not null)
                     {
                         // Entered new patch, complete old one.
-                        patches.Add(patch.AsReadOnly());
+                        patches.Add(patch.Compile());
                     }
 
                     var match = hunk_offset_regex.Match(line);
@@ -144,7 +144,7 @@ partial struct PatchFile
         // Add the last patch.
         if (patch is not null)
         {
-            patches.Add(patch.AsReadOnly());
+            patches.Add(patch.Compile());
         }
 
         if (verifyHeaders)

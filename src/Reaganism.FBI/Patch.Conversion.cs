@@ -10,7 +10,7 @@ partial class Patch
     /// </summary>
     /// <returns>The read-only patch with extra information.</returns>
     [PublicAPI]
-    public CompiledPatch AsReadOnly()
+    public CompiledPatch Compile()
     {
         return new CompiledPatch(this);
     }

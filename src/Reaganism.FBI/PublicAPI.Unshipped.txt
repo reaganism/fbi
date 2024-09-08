@@ -72,7 +72,7 @@ Reaganism.FBI.Operation
 Reaganism.FBI.Operation.LinePrefix.get -> string!
 Reaganism.FBI.Operation.Operation() -> void
 Reaganism.FBI.Patch
-Reaganism.FBI.Patch.AsReadOnly() -> Reaganism.FBI.CompiledPatch
+Reaganism.FBI.Patch.Compile() -> Reaganism.FBI.CompiledPatch
 Reaganism.FBI.Patch.Clone() -> Reaganism.FBI.Patch!
 Reaganism.FBI.Patch.Diffs.get -> System.Collections.Generic.List<Reaganism.FBI.DiffLine>!
 Reaganism.FBI.Patch.Patch(System.Collections.Generic.List<Reaganism.FBI.DiffLine>? diffLines = null) -> void
