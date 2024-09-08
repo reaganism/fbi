@@ -196,14 +196,11 @@ public class PatienceDiffer(TokenMapper? tokenMapper = null) : IDiffer
     [PublicAPI]
     public TokenMapper TokenMapper { [PublicAPI] get; } = tokenMapper ?? new TokenMapper();
 
-    private string? lineModeString1;
-    private string? lineModeString2;
-
     [PublicAPI]
     public virtual int[] Match(IReadOnlyCollection<string> originalLines, IReadOnlyCollection<string> modifiedLines)
     {
-        lineModeString1 = TokenMapper.LinesToIds(originalLines);
-        lineModeString2 = TokenMapper.LinesToIds(modifiedLines);
+        var lineModeString1 = TokenMapper.LinesToIds(originalLines);
+        var lineModeString2 = TokenMapper.LinesToIds(modifiedLines);
 
         return PatienceMatch.Match(lineModeString1, lineModeString2, TokenMapper.MaxLineId);
     }
