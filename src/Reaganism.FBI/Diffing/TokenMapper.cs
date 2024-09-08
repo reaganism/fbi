@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 
 using JetBrains.Annotations;
 
@@ -275,21 +274,6 @@ public sealed class TokenMapper
         }
     }
     */
-
-    // Simplified implementation of MemoryMarshal::Cast for read-only spans
-    // WITHOUT handling different sizes/lengths or ensuring types don't contain
-    // references, since we only use it for converting ushort spans to char
-    // spans, which are both blittable structs with the same size.
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static ReadOnlySpan<TTo> Cast<TFrom, TTo>(ReadOnlySpan<TFrom> span)
-        where TFrom : struct
-        where TTo : struct
-    {
-        return MemoryMarshal.CreateReadOnlySpan(
-            ref Unsafe.As<TFrom, TTo>(ref MemoryMarshal.GetReference(span)),
-            span.Length
-        );
-    }
 
     // Mirrors the .NET 8 String::GetHashCode implementation but specifically
     // computes only the hash of a specific character range within the string.
