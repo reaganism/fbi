@@ -50,7 +50,7 @@ public readonly partial struct PatchFile(List<CompiledPatch> patches, string? or
                 {
                     foreach (var diff in patch.Diffs)
                     {
-                        sb.AppendLine(diff.ToString());
+                        diff.AppendLine(sb);
                     }
                 }
             }

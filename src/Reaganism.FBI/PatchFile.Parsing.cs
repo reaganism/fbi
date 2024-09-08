@@ -41,9 +41,10 @@ partial struct PatchFile
     [PublicAPI]
     public static PatchFile FromLines(IEnumerable<string> lines, bool verifyHeaders = true)
     {
-        var patches = new List<CompiledPatch>();
-        var patch   = default(Patch);
-        var delta   = 0;
+        var patches      = new List<CompiledPatch>();
+        var patch        = default(Patch);
+        var patchCreated = false;
+        var delta        = 0;
 
         var originalPath = default(string);
         var modifiedPath = default(string);
@@ -61,7 +62,7 @@ partial struct PatchFile
 
             // Parse context lines.
             {
-                if (patch is null && line[0] != '@')
+                if (patchCreated && line[0] != '@')
                 {
                     if (i == 1 && line.StartsWith("--- "))
                     {
@@ -83,7 +84,7 @@ partial struct PatchFile
             switch (line[0])
             {
                 case '@':
-                    if (patch is not null)
+                    if (patchCreated)
                     {
                         // Entered new patch, complete old one.
                         patches.Add(patch.Compile());
@@ -95,6 +96,7 @@ partial struct PatchFile
                         throw new InvalidDataException($"Invalid hunk offset({i}): {line}");
                     }
 
+                    patchCreated = true;
                     patch = new Patch
                     {
                         Start1  = int.Parse(match.Groups[1].Value) - 1,
@@ -122,17 +124,17 @@ partial struct PatchFile
                     break;
 
                 case ' ':
-                    Debug.Assert(patch is not null);
+                    Debug.Assert(patchCreated);
                     patch.Diffs.Add(new DiffLine(Operation.EQUALS, line, true));
                     break;
 
                 case '+':
-                    Debug.Assert(patch is not null);
+                    Debug.Assert(patchCreated);
                     patch.Diffs.Add(new DiffLine(Operation.INSERT, line, true));
                     break;
 
                 case '-':
-                    Debug.Assert(patch is not null);
+                    Debug.Assert(patchCreated);
                     patch.Diffs.Add(new DiffLine(Operation.DELETE, line, true));
                     break;
 
@@ -142,7 +144,7 @@ partial struct PatchFile
         }
 
         // Add the last patch.
-        if (patch is not null)
+        if (patchCreated)
         {
             patches.Add(patch.Compile());
         }

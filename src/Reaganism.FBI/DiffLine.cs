@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Text;
 
 using JetBrains.Annotations;
 
@@ -26,7 +27,7 @@ public readonly record struct DiffLine
     [PublicAPI]
     public string Text { [PublicAPI] get; }
 
-    private readonly string line;
+    private readonly string? line;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="DiffLine"/> struct.
@@ -38,7 +39,7 @@ public readonly record struct DiffLine
     {
         Operation = operation;
         Text      = text;
-        line      = operation.LinePrefix + text;
+        line      = null;
     }
 
     // Reduces allocations somewhat by allowing the original line with the
@@ -50,7 +51,25 @@ public readonly record struct DiffLine
 
         Operation = operation;
         Text      = hasPrefix ? text[1..] : text;
-        line      = hasPrefix ? text : operation.LinePrefix + text;
+        line      = hasPrefix ? text : null;
+    }
+
+    internal void Append(StringBuilder sb)
+    {
+        if (line is not null)
+        {
+            sb.Append(line);
+        }
+        else
+        {
+            sb.Append(Operation.LinePrefix).Append(Text);
+        }
+    }
+
+    internal void AppendLine(StringBuilder sb)
+    {
+        Append(sb);
+        sb.AppendLine();
     }
 
     /// <summary>
@@ -59,6 +78,6 @@ public readonly record struct DiffLine
     [PublicAPI]
     public override string ToString()
     {
-        return line;
+        return line ?? Operation.LinePrefix + Text;
     }
 }

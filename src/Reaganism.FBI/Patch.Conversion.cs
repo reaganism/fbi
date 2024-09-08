@@ -2,7 +2,7 @@ using JetBrains.Annotations;
 
 namespace Reaganism.FBI;
 
-partial class Patch
+partial struct Patch
 {
     /// <summary>
     ///     Creates a <see cref="CompiledPatch"/> derived from the current state

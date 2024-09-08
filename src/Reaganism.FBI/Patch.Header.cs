@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 
 namespace Reaganism.FBI;
 
-partial class Patch
+partial struct Patch
 {
     private static readonly Dictionary<(LineRange, LineRange), string> auto_headers = [];
     private static readonly Dictionary<(LineRange, LineRange), string> headers      = [];

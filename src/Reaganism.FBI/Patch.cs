@@ -19,7 +19,7 @@ namespace Reaganism.FBI;
 /// </remarks>
 /// <seealso cref="CompiledPatch"/>
 [PublicAPI]
-public sealed partial class Patch
+public partial struct Patch
 {
     /// <summary>
     ///     The diffs this patch collates.
