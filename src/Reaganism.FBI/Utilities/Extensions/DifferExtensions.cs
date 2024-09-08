@@ -21,7 +21,7 @@ public static class DifferExtensions
     }
 
     [PublicAPI]
-    public static IEnumerable<ReadOnlyPatch> MakePatches(
+    public static IEnumerable<CompiledPatch> MakePatches(
         this IDiffer          @this,
         IReadOnlyList<string> originalLines,
         IReadOnlyList<string> modifiedLines,

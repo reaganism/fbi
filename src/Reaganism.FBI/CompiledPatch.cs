@@ -12,12 +12,12 @@ namespace Reaganism.FBI;
 /// </summary>
 /// <remarks>
 ///     <see cref="Patch"/> should be used for the initial creation and basic
-///     processing. <see cref="ReadOnlyPatch"/>es are for working with finalized
+///     processing. <see cref="CompiledPatch"/>es are for working with finalized
 ///     data.
 /// </remarks>
 /// <seealso cref="Patch"/>
 [PublicAPI]
-public readonly struct ReadOnlyPatch
+public readonly struct CompiledPatch
 {
     /// <summary>
     ///     The diffs this patch collates.
@@ -72,7 +72,7 @@ public readonly struct ReadOnlyPatch
     public LineRange TrimmedRange2 { [PublicAPI] get; }
 
     [PublicAPI]
-    public ReadOnlyPatch(Patch patch)
+    public CompiledPatch(Patch patch)
     {
         // Shallow-clone the diffs; we don't need to reinitialize since they're
         // structs.  TODO(perf): It'd be nice to avoid this operation.

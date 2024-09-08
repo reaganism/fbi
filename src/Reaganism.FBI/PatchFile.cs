@@ -6,16 +6,16 @@ using JetBrains.Annotations;
 namespace Reaganism.FBI;
 
 /// <summary>
-///     A patch file, containing a collection of <see cref="ReadOnlyPatch"/>es.
+///     A patch file, containing a collection of <see cref="CompiledPatch"/>es.
 /// </summary>
 [PublicAPI]
-public readonly partial struct PatchFile(List<ReadOnlyPatch> patches, string? originalPatch, string? modifiedPath)
+public readonly partial struct PatchFile(List<CompiledPatch> patches, string? originalPatch, string? modifiedPath)
 {
     /// <summary>
     ///     The patches contained in this patch file.
     /// </summary>
     [PublicAPI]
-    public List<ReadOnlyPatch> Patches { [PublicAPI] get; } = patches;
+    public List<CompiledPatch> Patches { [PublicAPI] get; } = patches;
 
     /// <summary>
     ///     The original path of the file being patched.

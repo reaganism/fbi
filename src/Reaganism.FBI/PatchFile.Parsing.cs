@@ -41,7 +41,7 @@ partial struct PatchFile
     [PublicAPI]
     public static PatchFile FromLines(IEnumerable<string> lines, bool verifyHeaders = true)
     {
-        var patches = new List<ReadOnlyPatch>();
+        var patches = new List<CompiledPatch>();
         var patch   = default(Patch);
         var delta   = 0;
 

@@ -27,10 +27,10 @@ public sealed class Patcher
     }
 
     [PublicAPI]
-    public sealed class Result(ReadOnlyPatch patch)
+    public sealed class Result(CompiledPatch patch)
     {
         [PublicAPI]
-        public ReadOnlyPatch Patch { [PublicAPI] get; } = patch;
+        public CompiledPatch Patch { [PublicAPI] get; } = patch;
 
         [PublicAPI]
         public bool Success { [PublicAPI] get; [PublicAPI] init; }
@@ -42,7 +42,7 @@ public sealed class Patcher
         public int SearchOffset { [PublicAPI] get; [PublicAPI] set; }
 
         [PublicAPI]
-        public ReadOnlyPatch? AppliedPatch { [PublicAPI] get; [PublicAPI] set; }
+        public CompiledPatch? AppliedPatch { [PublicAPI] get; [PublicAPI] set; }
 
         [PublicAPI]
         public int Offset { [PublicAPI] get; [PublicAPI] set; }
@@ -84,9 +84,9 @@ public sealed class Patcher
     }
 
     // TODO: Revise entire Patcher API; remove/refactor all of this.
-    private sealed class WorkingPatch(ReadOnlyPatch patch)
+    private sealed class WorkingPatch(CompiledPatch patch)
     {
-        public ReadOnlyPatch Patch { get; } = patch;
+        public CompiledPatch Patch { get; } = patch;
 
         public Result? Result { get; private set; }
 
@@ -104,7 +104,7 @@ public sealed class Patcher
 
         public int? AppliedDelta => Result?.AppliedPatch?.Range2.Length - Result?.AppliedPatch?.Range1.Length;
 
-        public void Succeed(Mode mode, ReadOnlyPatch appliedPatch)
+        public void Succeed(Mode mode, CompiledPatch appliedPatch)
         {
             Result = new Result(Patch)
             {
@@ -250,7 +250,7 @@ public sealed class Patcher
 
     // Last here means highest line number, not necessarily most recent.
     // Patches can only apply before `lastAppliedPatch` in fuzzy mode.
-    private ReadOnlyPatch? lastAppliedPatch;
+    private CompiledPatch? lastAppliedPatch;
 
     // We maintain delta as the offset of the last patch (applied location -
     // expected location).  This way if a line is inserted, and all patches are
@@ -260,7 +260,7 @@ public sealed class Patcher
     private int searchOffset;
 
     [PublicAPI]
-    public Patcher(IEnumerable<ReadOnlyPatch> patches, IEnumerable<string> lines, TokenMapper? tokenMapper = null)
+    public Patcher(IEnumerable<CompiledPatch> patches, IEnumerable<string> lines, TokenMapper? tokenMapper = null)
     {
         this.patches     = patches.Select(x => new WorkingPatch(x)).ToList();
         this.lines       = lines.ToList();
@@ -320,7 +320,7 @@ public sealed class Patcher
         wmLines = lines.Select(x => tokenMapper.WordsToIds(x)).ToList();
     }
 
-    private ReadOnlyPatch ApplyExactAt(int loc, WorkingPatch patch)
+    private CompiledPatch ApplyExactAt(int loc, WorkingPatch patch)
     {
         if (!patch.Patch.ContextLines.SequenceEqual(lines.GetRange(loc, patch.Patch.Range1.Length)))
         {
@@ -385,7 +385,7 @@ public sealed class Patcher
         return appliedPatch;
     }
 
-    private bool CanApplySafelyAt(int loc, ReadOnlyPatch patch)
+    private bool CanApplySafelyAt(int loc, CompiledPatch patch)
     {
         if (loc >= ModifiedRange.End)
         {
@@ -539,7 +539,7 @@ public sealed class Patcher
         return (bestMatch, bestScore);
     }
 
-    private static ReadOnlyPatch AdjustPatchToMatchedLines(ReadOnlyPatch patch, int[] match, IReadOnlyList<string> lines)
+    private static CompiledPatch AdjustPatchToMatchedLines(CompiledPatch patch, int[] match, IReadOnlyList<string> lines)
     {
         var fuzzyPatch = patch.CreateMutable();
         var diffs      = fuzzyPatch.Diffs;

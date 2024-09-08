@@ -72,7 +72,7 @@ Reaganism.FBI.Operation
 Reaganism.FBI.Operation.LinePrefix.get -> string!
 Reaganism.FBI.Operation.Operation() -> void
 Reaganism.FBI.Patch
-Reaganism.FBI.Patch.AsReadOnly() -> Reaganism.FBI.ReadOnlyPatch
+Reaganism.FBI.Patch.AsReadOnly() -> Reaganism.FBI.CompiledPatch
 Reaganism.FBI.Patch.Clone() -> Reaganism.FBI.Patch!
 Reaganism.FBI.Patch.Diffs.get -> System.Collections.Generic.List<Reaganism.FBI.DiffLine>!
 Reaganism.FBI.Patch.Patch(System.Collections.Generic.List<Reaganism.FBI.DiffLine>? diffLines = null) -> void
@@ -84,9 +84,9 @@ Reaganism.FBI.PatchFile.ModifiedPath.get -> string?
 Reaganism.FBI.PatchFile.ModifiedPath.set -> void
 Reaganism.FBI.PatchFile.OriginalPath.get -> string?
 Reaganism.FBI.PatchFile.OriginalPath.set -> void
-Reaganism.FBI.PatchFile.Patches.get -> System.Collections.Generic.List<Reaganism.FBI.ReadOnlyPatch>!
+Reaganism.FBI.PatchFile.Patches.get -> System.Collections.Generic.List<Reaganism.FBI.CompiledPatch>!
 Reaganism.FBI.PatchFile.PatchFile() -> void
-Reaganism.FBI.PatchFile.PatchFile(System.Collections.Generic.List<Reaganism.FBI.ReadOnlyPatch>! patches, string? originalPatch, string? modifiedPath) -> void
+Reaganism.FBI.PatchFile.PatchFile(System.Collections.Generic.List<Reaganism.FBI.CompiledPatch>! patches, string? originalPatch, string? modifiedPath) -> void
 Reaganism.FBI.PatchFile.ToString(bool autoOffset, string? originalPath = null, string? modifiedPath = null) -> string!
 Reaganism.FBI.Patching.Patcher
 Reaganism.FBI.Patching.Patcher.FuzzyMatchOptions
@@ -104,9 +104,9 @@ Reaganism.FBI.Patching.Patcher.Mode.Exact = 0 -> Reaganism.FBI.Patching.Patcher.
 Reaganism.FBI.Patching.Patcher.Mode.Fuzzy = 2 -> Reaganism.FBI.Patching.Patcher.Mode
 Reaganism.FBI.Patching.Patcher.Mode.Offset = 1 -> Reaganism.FBI.Patching.Patcher.Mode
 Reaganism.FBI.Patching.Patcher.Patch(Reaganism.FBI.Patching.Patcher.Mode mode) -> void
-Reaganism.FBI.Patching.Patcher.Patcher(System.Collections.Generic.IEnumerable<Reaganism.FBI.ReadOnlyPatch>! patches, System.Collections.Generic.IEnumerable<string!>! lines, Reaganism.FBI.Diffing.TokenMapper? tokenMapper = null) -> void
+Reaganism.FBI.Patching.Patcher.Patcher(System.Collections.Generic.IEnumerable<Reaganism.FBI.CompiledPatch>! patches, System.Collections.Generic.IEnumerable<string!>! lines, Reaganism.FBI.Diffing.TokenMapper? tokenMapper = null) -> void
 Reaganism.FBI.Patching.Patcher.Result
-Reaganism.FBI.Patching.Patcher.Result.AppliedPatch.get -> Reaganism.FBI.ReadOnlyPatch?
+Reaganism.FBI.Patching.Patcher.Result.AppliedPatch.get -> Reaganism.FBI.CompiledPatch?
 Reaganism.FBI.Patching.Patcher.Result.AppliedPatch.set -> void
 Reaganism.FBI.Patching.Patcher.Result.FuzzyQuality.get -> float
 Reaganism.FBI.Patching.Patcher.Result.FuzzyQuality.set -> void
@@ -116,8 +116,8 @@ Reaganism.FBI.Patching.Patcher.Result.Offset.get -> int
 Reaganism.FBI.Patching.Patcher.Result.Offset.set -> void
 Reaganism.FBI.Patching.Patcher.Result.OffsetWarning.get -> bool
 Reaganism.FBI.Patching.Patcher.Result.OffsetWarning.set -> void
-Reaganism.FBI.Patching.Patcher.Result.Patch.get -> Reaganism.FBI.ReadOnlyPatch
-Reaganism.FBI.Patching.Patcher.Result.Result(Reaganism.FBI.ReadOnlyPatch patch) -> void
+Reaganism.FBI.Patching.Patcher.Result.Patch.get -> Reaganism.FBI.CompiledPatch
+Reaganism.FBI.Patching.Patcher.Result.Result(Reaganism.FBI.CompiledPatch patch) -> void
 Reaganism.FBI.Patching.Patcher.Result.SearchOffset.get -> int
 Reaganism.FBI.Patching.Patcher.Result.SearchOffset.set -> void
 Reaganism.FBI.Patching.Patcher.Result.Success.get -> bool
@@ -125,19 +125,19 @@ Reaganism.FBI.Patching.Patcher.Result.Success.init -> void
 Reaganism.FBI.Patching.Patcher.Result.Summary() -> string!
 Reaganism.FBI.Patching.Patcher.ResultLines.get -> string![]!
 Reaganism.FBI.Patching.Patcher.Results.get -> System.Collections.Generic.IEnumerable<Reaganism.FBI.Patching.Patcher.Result?>!
-Reaganism.FBI.ReadOnlyPatch
-Reaganism.FBI.ReadOnlyPatch.ContextLines.get -> System.Collections.Generic.IReadOnlyCollection<string!>!
-Reaganism.FBI.ReadOnlyPatch.CreateMutable() -> Reaganism.FBI.Patch!
-Reaganism.FBI.ReadOnlyPatch.Diffs.get -> System.Collections.Generic.IReadOnlyCollection<Reaganism.FBI.DiffLine>!
-Reaganism.FBI.ReadOnlyPatch.PatchedLines.get -> System.Collections.Generic.IReadOnlyCollection<string!>!
-Reaganism.FBI.ReadOnlyPatch.Range1.get -> Reaganism.FBI.LineRange
-Reaganism.FBI.ReadOnlyPatch.Range1.init -> void
-Reaganism.FBI.ReadOnlyPatch.Range2.get -> Reaganism.FBI.LineRange
-Reaganism.FBI.ReadOnlyPatch.Range2.init -> void
-Reaganism.FBI.ReadOnlyPatch.ReadOnlyPatch() -> void
-Reaganism.FBI.ReadOnlyPatch.ReadOnlyPatch(Reaganism.FBI.Patch! patch) -> void
-Reaganism.FBI.ReadOnlyPatch.TrimmedRange1.get -> Reaganism.FBI.LineRange
-Reaganism.FBI.ReadOnlyPatch.TrimmedRange2.get -> Reaganism.FBI.LineRange
+Reaganism.FBI.CompiledPatch
+Reaganism.FBI.CompiledPatch.ContextLines.get -> System.Collections.Generic.IReadOnlyCollection<string!>!
+Reaganism.FBI.CompiledPatch.CreateMutable() -> Reaganism.FBI.Patch!
+Reaganism.FBI.CompiledPatch.Diffs.get -> System.Collections.Generic.IReadOnlyCollection<Reaganism.FBI.DiffLine>!
+Reaganism.FBI.CompiledPatch.PatchedLines.get -> System.Collections.Generic.IReadOnlyCollection<string!>!
+Reaganism.FBI.CompiledPatch.Range1.get -> Reaganism.FBI.LineRange
+Reaganism.FBI.CompiledPatch.Range1.init -> void
+Reaganism.FBI.CompiledPatch.Range2.get -> Reaganism.FBI.LineRange
+Reaganism.FBI.CompiledPatch.Range2.init -> void
+Reaganism.FBI.CompiledPatch.CompiledPatch() -> void
+Reaganism.FBI.CompiledPatch.CompiledPatch(Reaganism.FBI.Patch! patch) -> void
+Reaganism.FBI.CompiledPatch.TrimmedRange1.get -> Reaganism.FBI.LineRange
+Reaganism.FBI.CompiledPatch.TrimmedRange2.get -> Reaganism.FBI.LineRange
 Reaganism.FBI.Operation.Equals(Reaganism.FBI.Operation other) -> bool
 Reaganism.FBI.Utilities.Extensions.DifferExtensions
 static readonly Reaganism.FBI.Operation.DELETE -> Reaganism.FBI.Operation
@@ -154,13 +154,13 @@ static Reaganism.FBI.LineRange.operator -(Reaganism.FBI.LineRange range, int i) 
 static Reaganism.FBI.Matching.FuzzyLineMatcher.MatchLines(string! s, string! t) -> float
 static Reaganism.FBI.Patch.GetHeader(Reaganism.FBI.LineRange range1, Reaganism.FBI.LineRange range2, bool auto) -> string!
 static Reaganism.FBI.Patch.GetHeader(Reaganism.FBI.Patch! patch, bool auto) -> string!
-static Reaganism.FBI.Patch.GetHeader(Reaganism.FBI.ReadOnlyPatch patch, bool auto) -> string!
+static Reaganism.FBI.Patch.GetHeader(Reaganism.FBI.CompiledPatch patch, bool auto) -> string!
 static Reaganism.FBI.PatchFile.FromLines(System.Collections.Generic.IEnumerable<string!>! lines, bool verifyHeaders = true) -> Reaganism.FBI.PatchFile
 static Reaganism.FBI.PatchFile.FromText(string! patchText, bool verifyHeaders = true) -> Reaganism.FBI.PatchFile
 static Reaganism.FBI.Operation.operator ==(Reaganism.FBI.Operation left, Reaganism.FBI.Operation right) -> bool
 static Reaganism.FBI.Operation.operator !=(Reaganism.FBI.Operation left, Reaganism.FBI.Operation right) -> bool
 static Reaganism.FBI.Utilities.Extensions.DifferExtensions.Diff(this Reaganism.FBI.Diffing.IDiffer! this, System.Collections.Generic.IReadOnlyList<string!>! originalLines, System.Collections.Generic.IReadOnlyList<string!>! modifiedLines) -> System.Collections.Generic.List<Reaganism.FBI.DiffLine>!
-static Reaganism.FBI.Utilities.Extensions.DifferExtensions.MakePatches(this Reaganism.FBI.Diffing.IDiffer! this, System.Collections.Generic.IReadOnlyList<string!>! originalLines, System.Collections.Generic.IReadOnlyList<string!>! modifiedLines, int contextLinesCount = 3, bool collate = true) -> System.Collections.Generic.IEnumerable<Reaganism.FBI.ReadOnlyPatch>!
+static Reaganism.FBI.Utilities.Extensions.DifferExtensions.MakePatches(this Reaganism.FBI.Diffing.IDiffer! this, System.Collections.Generic.IReadOnlyList<string!>! originalLines, System.Collections.Generic.IReadOnlyList<string!>! modifiedLines, int contextLinesCount = 3, bool collate = true) -> System.Collections.Generic.IEnumerable<Reaganism.FBI.CompiledPatch>!
 virtual Reaganism.FBI.Diffing.PatienceDiffer.Match(System.Collections.Generic.IReadOnlyCollection<string!>! originalLines, System.Collections.Generic.IReadOnlyCollection<string!>! modifiedLines) -> int[]!
 ~override Reaganism.FBI.Operation.ToString() -> string
 ~override Reaganism.FBI.Operation.Equals(object obj) -> bool

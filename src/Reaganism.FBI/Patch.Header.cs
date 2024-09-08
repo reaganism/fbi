@@ -38,7 +38,7 @@ partial class Patch
     /// </param>
     /// <returns>The header.</returns>
     [PublicAPI]
-    public static string GetHeader(ReadOnlyPatch patch, bool auto)
+    public static string GetHeader(CompiledPatch patch, bool auto)
     {
         return GetHeader(patch.Range1, patch.Range2, auto);
     }

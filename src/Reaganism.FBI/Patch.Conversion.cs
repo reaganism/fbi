@@ -5,14 +5,14 @@ namespace Reaganism.FBI;
 partial class Patch
 {
     /// <summary>
-    ///     Creates a <see cref="ReadOnlyPatch"/> derived from the current state
+    ///     Creates a <see cref="CompiledPatch"/> derived from the current state
     ///     of this patch.
     /// </summary>
     /// <returns>The read-only patch with extra information.</returns>
     [PublicAPI]
-    public ReadOnlyPatch AsReadOnly()
+    public CompiledPatch AsReadOnly()
     {
-        return new ReadOnlyPatch(this);
+        return new CompiledPatch(this);
     }
 
     /// <summary>

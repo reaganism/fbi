@@ -61,7 +61,7 @@ public static class Differ
     /// </param>
     /// <param name="collate">Whether patches should be collated.</param>
     /// <returns>The produced patch collection.</returns>
-    internal static IEnumerable<ReadOnlyPatch> MakePatches(
+    internal static IEnumerable<CompiledPatch> MakePatches(
         List<DiffLine> diffs,
         int            contextLinesCount = DEFAULT_CONTEXT_COUNT,
         bool           collate           = true

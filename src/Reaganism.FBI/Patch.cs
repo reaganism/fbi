@@ -14,10 +14,10 @@ namespace Reaganism.FBI;
 /// <remarks>
 ///     This is a mutable representation designed for modifications before the
 ///     finalization of data. Most APIs are intended to consume
-///     <see cref="ReadOnlyPatch"/>es, which are produced from data within this
+///     <see cref="CompiledPatch"/>es, which are produced from data within this
 ///     class.
 /// </remarks>
-/// <seealso cref="ReadOnlyPatch"/>
+/// <seealso cref="CompiledPatch"/>
 [PublicAPI]
 public sealed partial class Patch
 {
