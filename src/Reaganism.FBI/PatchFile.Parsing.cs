@@ -62,7 +62,7 @@ partial struct PatchFile
 
             // Parse context lines.
             {
-                if (patchCreated && line[0] != '@')
+                if (!patchCreated && line[0] != '@')
                 {
                     if (i == 1 && line.StartsWith("--- "))
                     {
@@ -96,13 +96,11 @@ partial struct PatchFile
                         throw new InvalidDataException($"Invalid hunk offset({i}): {line}");
                     }
 
-                    patchCreated = true;
-                    patch = new Patch
-                    {
-                        Start1  = int.Parse(match.Groups[1].Value) - 1,
-                        Length1 = int.Parse(match.Groups[2].Value),
-                        Length2 = int.Parse(match.Groups[4].Value),
-                    };
+                    patchCreated  = true;
+                    patch         = new Patch();
+                    patch.Start1  = int.Parse(match.Groups[1].Value) - 1;
+                    patch.Length1 = int.Parse(match.Groups[2].Value);
+                    patch.Length2 = int.Parse(match.Groups[4].Value);
 
                     // Range2 start is automatically determined.
                     if (match.Groups[3].Value == "_")

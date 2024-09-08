@@ -19,7 +19,7 @@ namespace Reaganism.FBI;
 /// </remarks>
 /// <seealso cref="CompiledPatch"/>
 [PublicAPI]
-public readonly partial struct Patch
+public readonly partial struct Patch()
 {
     private sealed class MutablePatchData
     {
@@ -36,7 +36,7 @@ public readonly partial struct Patch
     ///     The diffs this patch collates.
     /// </summary>
     [PublicAPI]
-    public List<DiffLine> Diffs { [PublicAPI] get; }
+    public List<DiffLine> Diffs { [PublicAPI] get; } = [];
 
     private readonly MutablePatchData data = new();
 
@@ -65,12 +65,12 @@ public readonly partial struct Patch
     }
 
     [PublicAPI]
-    public Patch(List<DiffLine>? diffLines = null)
+    public Patch(List<DiffLine>? diffLines = null) : this()
     {
         Diffs = diffLines ?? [];
     }
 
-    private Patch(Patch other)
+    private Patch(Patch other) : this()
     {
         // Shallow-clone so we don't keep a reference.
         Diffs = other.Diffs.ToList();
