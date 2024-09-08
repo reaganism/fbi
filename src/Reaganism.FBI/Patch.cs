@@ -19,18 +19,50 @@ namespace Reaganism.FBI;
 /// </remarks>
 /// <seealso cref="CompiledPatch"/>
 [PublicAPI]
-public partial struct Patch
+public readonly partial struct Patch
 {
+    private sealed class MutablePatchData
+    {
+        public int Start1 { get; set; }
+
+        public int Start2 { get; set; }
+
+        public int Length1 { get; set; }
+
+        public int Length2 { get; set; }
+    }
+
     /// <summary>
     ///     The diffs this patch collates.
     /// </summary>
     [PublicAPI]
-    public List<DiffLine> Diffs { [PublicAPI] get; private set; }
+    public List<DiffLine> Diffs { [PublicAPI] get; }
 
-    internal int Start1;
-    internal int Start2;
-    internal int Length1;
-    internal int Length2;
+    private readonly MutablePatchData data = new();
+
+    internal int Start1
+    {
+        get => data.Start1;
+        set => data.Start1 = value;
+    }
+
+    internal int Start2
+    {
+        get => data.Start2;
+        set => data.Start2 = value;
+    }
+
+    internal int Length1
+    {
+        get => data.Length1;
+        set => data.Length1 = value;
+    }
+
+    internal int Length2
+    {
+        get => data.Length2;
+        set => data.Length2 = value;
+    }
 
     [PublicAPI]
     public Patch(List<DiffLine>? diffLines = null)
@@ -109,7 +141,7 @@ public partial struct Patch
         return this;
     }
 
-    /// <summary>
+    /*/// <summary>
     ///     "Uncollates" the patch, cleaning up ordering so chunks of deletions
     ///     and insertions are separated and positioned properly.
     /// </summary>
@@ -168,7 +200,7 @@ public partial struct Patch
         // patch does not end with any context thus the chunk does not "end").
         uncollated.AddRange(insertions);
         Diffs = uncollated;
-    }
+    }*/
 
     /// <summary>
     ///     Splits the current patch into multiple, smaller patches. When there
