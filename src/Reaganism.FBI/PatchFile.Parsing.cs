@@ -8,7 +8,7 @@ using JetBrains.Annotations;
 
 namespace Reaganism.FBI;
 
-partial class PatchFile
+partial struct PatchFile
 {
     private static readonly Regex hunk_offset_regex = HunkOffsetRegex();
 

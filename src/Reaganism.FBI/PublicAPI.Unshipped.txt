@@ -85,6 +85,7 @@ Reaganism.FBI.PatchFile.ModifiedPath.set -> void
 Reaganism.FBI.PatchFile.OriginalPath.get -> string?
 Reaganism.FBI.PatchFile.OriginalPath.set -> void
 Reaganism.FBI.PatchFile.Patches.get -> System.Collections.Generic.List<Reaganism.FBI.ReadOnlyPatch>!
+Reaganism.FBI.PatchFile.PatchFile() -> void
 Reaganism.FBI.PatchFile.PatchFile(System.Collections.Generic.List<Reaganism.FBI.ReadOnlyPatch>! patches, string? originalPatch, string? modifiedPath) -> void
 Reaganism.FBI.PatchFile.ToString(bool autoOffset, string? originalPath = null, string? modifiedPath = null) -> string!
 Reaganism.FBI.Patching.Patcher
@@ -154,8 +155,8 @@ static Reaganism.FBI.Matching.FuzzyLineMatcher.MatchLines(string! s, string! t) 
 static Reaganism.FBI.Patch.GetHeader(Reaganism.FBI.LineRange range1, Reaganism.FBI.LineRange range2, bool auto) -> string!
 static Reaganism.FBI.Patch.GetHeader(Reaganism.FBI.Patch! patch, bool auto) -> string!
 static Reaganism.FBI.Patch.GetHeader(Reaganism.FBI.ReadOnlyPatch patch, bool auto) -> string!
-static Reaganism.FBI.PatchFile.FromLines(System.Collections.Generic.IEnumerable<string!>! lines, bool verifyHeaders = true) -> Reaganism.FBI.PatchFile!
-static Reaganism.FBI.PatchFile.FromText(string! patchText, bool verifyHeaders = true) -> Reaganism.FBI.PatchFile!
+static Reaganism.FBI.PatchFile.FromLines(System.Collections.Generic.IEnumerable<string!>! lines, bool verifyHeaders = true) -> Reaganism.FBI.PatchFile
+static Reaganism.FBI.PatchFile.FromText(string! patchText, bool verifyHeaders = true) -> Reaganism.FBI.PatchFile
 static Reaganism.FBI.Operation.operator ==(Reaganism.FBI.Operation left, Reaganism.FBI.Operation right) -> bool
 static Reaganism.FBI.Operation.operator !=(Reaganism.FBI.Operation left, Reaganism.FBI.Operation right) -> bool
 static Reaganism.FBI.Utilities.Extensions.DifferExtensions.Diff(this Reaganism.FBI.Diffing.IDiffer! this, System.Collections.Generic.IReadOnlyList<string!>! originalLines, System.Collections.Generic.IReadOnlyList<string!>! modifiedLines) -> System.Collections.Generic.List<Reaganism.FBI.DiffLine>!

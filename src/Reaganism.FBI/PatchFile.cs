@@ -9,7 +9,7 @@ namespace Reaganism.FBI;
 ///     A patch file, containing a collection of <see cref="ReadOnlyPatch"/>es.
 /// </summary>
 [PublicAPI]
-public sealed partial class PatchFile(List<ReadOnlyPatch> patches, string? originalPatch, string? modifiedPath)
+public readonly partial struct PatchFile(List<ReadOnlyPatch> patches, string? originalPatch, string? modifiedPath)
 {
     /// <summary>
     ///     The patches contained in this patch file.
@@ -21,13 +21,13 @@ public sealed partial class PatchFile(List<ReadOnlyPatch> patches, string? origi
     ///     The original path of the file being patched.
     /// </summary>
     [PublicAPI]
-    public string? OriginalPath { [PublicAPI] get; [PublicAPI] set; } = originalPatch;
+    public string? OriginalPath { [PublicAPI] get; } = originalPatch;
 
     /// <summary>
     ///     The modified path of the file being patched.
     /// </summary>
     [PublicAPI]
-    public string? ModifiedPath { [PublicAPI] get; [PublicAPI] set; } = modifiedPath;
+    public string? ModifiedPath { [PublicAPI] get; } = modifiedPath;
 
 #region Serialization
     [PublicAPI]
