@@ -6,7 +6,7 @@
 
 **fbi** is a library for diffing and patching text files for .NET, directly inspired by and originally based on [Chicken-Bones/DiffPatch](https://github.com/Chicken-Bones/DiffPatch).
 
-This project *works* and, from my testing, it works *well*. That being said, the API is not finalized and is subject to change, and while it is perfectly usable in projects, API guarantees are not guaranteed until a proper release cycle is entered.
+This project *works*, and, from my testing, it works *well*. That being said, the API is not finalized and is subject to change, and while it is perfectly usable in projects, API guarantees are not guaranteed until a proper release cycle is entered.
 
 This projects iterates over `DiffPatch` significantly, boasting:
 
