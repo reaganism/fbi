@@ -106,10 +106,10 @@ public sealed class TokenMapper
 
     private ushort AddWord(string word, SimpleRange range)
     {
-        if (range.Length == 1 && word[0] <= 0x80)
+        if (range.Length == 1 && word[range.Start] <= 0x80)
         {
             // Use ASCII characters as-is.
-            return word[0];
+            return word[range.Start];
         }
 
         var hash = GetSlicedStringHashCode(word, range);
