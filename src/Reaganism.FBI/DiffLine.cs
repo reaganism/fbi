@@ -1,3 +1,6 @@
+using System;
+using System.Diagnostics;
+
 using JetBrains.Annotations;
 
 namespace Reaganism.FBI;
@@ -36,6 +39,18 @@ public readonly record struct DiffLine
         Operation = operation;
         Text      = text;
         line      = operation.LinePrefix + text;
+    }
+
+    // Reduces allocations somewhat by allowing the original line with the
+    // prefix to be passed as to not force it to be sliced just to be allocated
+    // again.  Goes from a slice operation and a concatenation to just a slice.
+    internal DiffLine(Operation operation, string text, bool hasPrefix)
+    {
+        Debug.Assert(hasPrefix ? text[0] == operation.LinePrefix[0] : text[0] != operation.LinePrefix[0]);
+
+        Operation = operation;
+        Text      = hasPrefix ? text[1..] : text;
+        line      = hasPrefix ? text : operation.LinePrefix + text;
     }
 
     /// <summary>

@@ -123,17 +123,17 @@ partial class PatchFile
 
                 case ' ':
                     Debug.Assert(patch is not null);
-                    patch.Diffs.Add(new DiffLine(Operation.EQUALS, line[1..]));
+                    patch.Diffs.Add(new DiffLine(Operation.EQUALS, line, true));
                     break;
 
                 case '+':
                     Debug.Assert(patch is not null);
-                    patch.Diffs.Add(new DiffLine(Operation.INSERT, line[1..]));
+                    patch.Diffs.Add(new DiffLine(Operation.INSERT, line, true));
                     break;
 
                 case '-':
                     Debug.Assert(patch is not null);
-                    patch.Diffs.Add(new DiffLine(Operation.DELETE, line[1..]));
+                    patch.Diffs.Add(new DiffLine(Operation.DELETE, line, true));
                     break;
 
                 default:
