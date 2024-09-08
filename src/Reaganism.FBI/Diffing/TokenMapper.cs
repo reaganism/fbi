@@ -37,6 +37,8 @@ public sealed class TokenMapper
     private readonly List<string>            idToWord = [];
     private readonly Dictionary<int, ushort> wordToId = new();
 
+    private readonly Dictionary<string, string> words_to_ids_cache = [];
+
     private char[] buf = new char[4096];
 
     private static readonly string[] cached_lines_to_ids;
@@ -134,6 +136,11 @@ public sealed class TokenMapper
     [PublicAPI]
     public string WordsToIds(string line)
     {
+        if (words_to_ids_cache.TryGetValue(line, out var cached))
+        {
+            return cached;
+        }
+
         var b      = 0;
         var length = line.Length;
 
@@ -191,7 +198,7 @@ public sealed class TokenMapper
             }
         }
 
-        return new string(buf, 0, b);
+        return words_to_ids_cache[line] = new string(buf, 0, b);
     }
 
     /// <summary>
