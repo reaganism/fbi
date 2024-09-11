@@ -1,10 +1,15 @@
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
+using Collections.Pooled;
+
 using JetBrains.Annotations;
+
+using Microsoft.Extensions.ObjectPool;
 
 namespace Reaganism.FBI.Diffing;
 
@@ -12,8 +17,10 @@ namespace Reaganism.FBI.Diffing;
 ///     Maps lines and words (tokens) to unique integer IDs.
 /// </summary>
 [PublicAPI]
-public sealed class TokenMapper
+public sealed class TokenMapper : IDisposable
 {
+    public static readonly ObjectPool<TokenMapper> POOL = ObjectPool.Create<TokenMapper>();
+
     private readonly record struct SimpleRange(int Start, int End)
     {
         public int Length => End - Start;
@@ -31,13 +38,13 @@ public sealed class TokenMapper
         [PublicAPI] get => idToWord.Count;
     }
 
-    private readonly List<string>               idToLine = [..cached_lines_to_ids];
-    private readonly Dictionary<string, ushort> lineToId = [];
+    private readonly PooledList<string>               idToLine = [..cached_lines_to_ids];
+    private readonly PooledDictionary<string, ushort> lineToId = [];
 
-    private readonly List<string>            idToWord = [];
-    private readonly Dictionary<int, ushort> wordToId = [];
+    private readonly PooledList<string>            idToWord = [];
+    private readonly PooledDictionary<int, ushort> wordToId = [];
 
-    private readonly Dictionary<string, string> wordsToIdsCache = [];
+    private readonly PooledDictionary<string, string> wordsToIdsCache = [];
 
     private char[] buf = new char[4096];
 
@@ -221,6 +228,16 @@ public sealed class TokenMapper
     public string GetWord(ushort id)
     {
         return idToWord[id];
+    }
+
+    [PublicAPI]
+    public void Dispose()
+    {
+        idToLine.Dispose();
+        lineToId.Dispose();
+        idToWord.Dispose();
+        wordToId.Dispose();
+        wordsToIdsCache.Dispose();
     }
 
     // EnumerateWords is inlined into WordsToIds directly to avoid heap

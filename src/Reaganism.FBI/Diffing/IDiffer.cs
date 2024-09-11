@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 using JetBrains.Annotations;
@@ -8,7 +9,7 @@ namespace Reaganism.FBI.Diffing;
 ///     A file differ capable of producing 
 /// </summary>
 [PublicAPI]
-public interface IDiffer
+public interface IDiffer : IDisposable
 {
     /// <summary>
     ///     The token mapper used to map tokens to their unique IDs.

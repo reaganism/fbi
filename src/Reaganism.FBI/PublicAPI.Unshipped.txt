@@ -14,17 +14,19 @@ Reaganism.FBI.Diffing.IDiffer
 Reaganism.FBI.Diffing.IDiffer.Match(System.Collections.Generic.IReadOnlyCollection<string!>! originalLines, System.Collections.Generic.IReadOnlyCollection<string!>! modifiedLines) -> int[]!
 Reaganism.FBI.Diffing.IDiffer.TokenMapper.get -> Reaganism.FBI.Diffing.TokenMapper!
 Reaganism.FBI.Diffing.LineMatchedDiffer
-Reaganism.FBI.Diffing.LineMatchedDiffer.LineMatchedDiffer(Reaganism.FBI.Diffing.TokenMapper? tokenMapper = null) -> void
+Reaganism.FBI.Diffing.LineMatchedDiffer.LineMatchedDiffer(Reaganism.FBI.Diffing.TokenMapper? tokenMapper = null, bool disposeMembers = true) -> void
 Reaganism.FBI.Diffing.LineMatchedDiffer.MaxMatchOffset.get -> int
 Reaganism.FBI.Diffing.LineMatchedDiffer.MaxMatchOffset.set -> void
 Reaganism.FBI.Diffing.LineMatchedDiffer.MinMatchScore.get -> float
 Reaganism.FBI.Diffing.LineMatchedDiffer.MinMatchScore.set -> void
 Reaganism.FBI.Diffing.PatienceDiffer
-Reaganism.FBI.Diffing.PatienceDiffer.PatienceDiffer(Reaganism.FBI.Diffing.TokenMapper? tokenMapper = null) -> void
+Reaganism.FBI.Diffing.PatienceDiffer.Dispose() -> void
+Reaganism.FBI.Diffing.PatienceDiffer.PatienceDiffer(Reaganism.FBI.Diffing.TokenMapper? tokenMapper = null, bool disposeMembers = true) -> void
 Reaganism.FBI.Diffing.PatienceDiffer.TokenMapper.get -> Reaganism.FBI.Diffing.TokenMapper!
 Reaganism.FBI.Diffing.TokenMapper
 Reaganism.FBI.Diffing.TokenMapper.AddLine(string! line) -> ushort
 Reaganism.FBI.Diffing.TokenMapper.AddWord(string! word) -> ushort
+Reaganism.FBI.Diffing.TokenMapper.Dispose() -> void
 Reaganism.FBI.Diffing.TokenMapper.GetWord(ushort id) -> string!
 Reaganism.FBI.Diffing.TokenMapper.LinesToIds(System.Collections.Generic.IEnumerable<string!>! lines) -> string!
 Reaganism.FBI.Diffing.TokenMapper.MaxLineId.get -> int
@@ -144,7 +146,7 @@ Reaganism.FBI.Utilities.Extensions.DifferExtensions
 static readonly Reaganism.FBI.Operation.DELETE -> Reaganism.FBI.Operation
 static readonly Reaganism.FBI.Operation.EQUALS -> Reaganism.FBI.Operation
 static readonly Reaganism.FBI.Operation.INSERT -> Reaganism.FBI.Operation
-static Reaganism.FBI.Diffing.Differ.DiffFiles(Reaganism.FBI.Diffing.IDiffer! differ, string! originalPath, string! modifiedPath, string? rootDir = null, int contextLinesCount = 3, bool collate = true) -> Reaganism.FBI.PatchFile!
+static Reaganism.FBI.Diffing.Differ.DiffFiles(Reaganism.FBI.Diffing.IDiffer! differ, string! originalPath, string! modifiedPath, string? rootDir = null, int contextLinesCount = 3, bool collate = true) -> Reaganism.FBI.PatchFile
 static Reaganism.FBI.DiffLine.operator ==(Reaganism.FBI.DiffLine left, Reaganism.FBI.DiffLine right) -> bool
 static Reaganism.FBI.DiffLine.operator !=(Reaganism.FBI.DiffLine left, Reaganism.FBI.DiffLine right) -> bool
 static Reaganism.FBI.LineRange.implicit operator System.Range(Reaganism.FBI.LineRange range) -> System.Range

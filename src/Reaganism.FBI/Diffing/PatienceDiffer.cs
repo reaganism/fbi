@@ -7,7 +7,7 @@ using JetBrains.Annotations;
 namespace Reaganism.FBI.Diffing;
 
 [PublicAPI]
-public class PatienceDiffer(TokenMapper? tokenMapper = null) : IDiffer
+public class PatienceDiffer(TokenMapper? tokenMapper = null, bool disposeMembers = true) : IDiffer
 {
     private static class PatienceMatch
     {
@@ -203,5 +203,14 @@ public class PatienceDiffer(TokenMapper? tokenMapper = null) : IDiffer
         var lineModeString2 = TokenMapper.LinesToIds(modifiedLines);
 
         return PatienceMatch.Match(lineModeString1, lineModeString2, TokenMapper.MaxLineId);
+    }
+
+    [PublicAPI]
+    public void Dispose()
+    {
+        if (disposeMembers)
+        {
+            TokenMapper.Dispose();
+        }
     }
 }

@@ -8,7 +8,7 @@ using Reaganism.FBI.Matching;
 namespace Reaganism.FBI.Diffing;
 
 [PublicAPI]
-public class LineMatchedDiffer(TokenMapper? tokenMapper = null) : PatienceDiffer(tokenMapper)
+public class LineMatchedDiffer(TokenMapper? tokenMapper = null, bool disposeMembers = true) : PatienceDiffer(tokenMapper, disposeMembers)
 {
     [PublicAPI]
     public int MaxMatchOffset
