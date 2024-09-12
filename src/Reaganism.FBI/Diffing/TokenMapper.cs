@@ -13,8 +13,20 @@ namespace Reaganism.FBI.Diffing;
 [PublicAPI]
 public sealed class TokenMapper
 {
+    /// <summary>
+    ///     Simple struct for handling ranges. It is unlike <see cref="Range"/>
+    ///     in that it contains integer indices (no wrapping struct) and does
+    ///     not have the option to be relative to the end instead of the start.
+    ///     <br />
+    ///     It also provides a simpler <see cref="Length"/> property.
+    /// </summary>
+    /// <param name="Start">The start of the range.</param>
+    /// <param name="End">The end of the range.</param>
     private readonly record struct SimpleRange(int Start, int End)
     {
+        /// <summary>
+        ///     The length of the range.
+        /// </summary>
         public int Length => End - Start;
     }
 
