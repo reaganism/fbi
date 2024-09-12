@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 using JetBrains.Annotations;
 
@@ -304,6 +305,7 @@ public sealed class MatchMatrix
         return path;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private int LocInRange(int loc)
     {
         return range.Contains(loc) ? loc : -1;
@@ -313,6 +315,7 @@ public sealed class MatchMatrix
     ///     Returns the pattern distance between two successive nodes in a
     ///     path with offsets <paramref name="i"/> and <paramref name="j"/>.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static int OffsetsToPatternDistance(int i, int j)
     {
         // i == j: line offsets are the same and the distance is 1 line.

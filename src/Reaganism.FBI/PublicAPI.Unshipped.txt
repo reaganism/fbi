@@ -144,7 +144,7 @@ Reaganism.FBI.Utilities.Extensions.DifferExtensions
 static readonly Reaganism.FBI.Operation.DELETE -> Reaganism.FBI.Operation
 static readonly Reaganism.FBI.Operation.EQUALS -> Reaganism.FBI.Operation
 static readonly Reaganism.FBI.Operation.INSERT -> Reaganism.FBI.Operation
-static Reaganism.FBI.Diffing.Differ.DiffFiles(Reaganism.FBI.Diffing.IDiffer! differ, string! originalPath, string! modifiedPath, string? rootDir = null, int contextLinesCount = 3, bool collate = true) -> Reaganism.FBI.PatchFile!
+static Reaganism.FBI.Diffing.Differ.DiffFiles(Reaganism.FBI.Diffing.IDiffer! differ, string! originalPath, string! modifiedPath, string? rootDir = null, int contextLinesCount = 3, bool collate = true) -> Reaganism.FBI.PatchFile
 static Reaganism.FBI.DiffLine.operator ==(Reaganism.FBI.DiffLine left, Reaganism.FBI.DiffLine right) -> bool
 static Reaganism.FBI.DiffLine.operator !=(Reaganism.FBI.DiffLine left, Reaganism.FBI.DiffLine right) -> bool
 static Reaganism.FBI.LineRange.implicit operator System.Range(Reaganism.FBI.LineRange range) -> System.Range

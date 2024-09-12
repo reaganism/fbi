@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 using JetBrains.Annotations;
 
@@ -34,30 +35,35 @@ public readonly record struct LineRange([PublicAPI] int Start, [PublicAPI] int E
     }
 
     [PublicAPI]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LineRange WithLength(int length)
     {
         return this with { End = Start + length };
     }
 
     [PublicAPI]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LineRange WithLast(int last)
     {
         return this with { End = last + 1 };
     }
 
     [PublicAPI]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Contains(int index)
     {
         return Start <= index && index < End;
     }
 
     [PublicAPI]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Contains(LineRange range)
     {
         return range.Start >= Start && range.End <= End;
     }
 
     [PublicAPI]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Intersects(LineRange range)
     {
         return range.Start < End || range.End > Start;
