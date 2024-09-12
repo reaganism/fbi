@@ -4,17 +4,8 @@
 
 ---
 
-**fbi** is a library for diffing and patching text files for .NET, directly inspired by and originally based on [Chicken-Bones/DiffPatch](https://github.com/Chicken-Bones/DiffPatch).
+**fbi** is fuzzy diff library implementing APIs for creating diffs and applying them as patches for .NET, directly inspired by and originally based on [Chicken-Bones/DiffPatch](https://github.com/Chicken-Bones/DiffPatch).
 
 This project *works*, and, from my testing, it works *well*. That being said, the API is not finalized and is subject to change, and while it is perfectly usable in projects, API guarantees are not guaranteed until a proper release cycle is entered.
 
-This projects iterates over `DiffPatch` significantly, boasting:
-
-- a considerably smaller memory footprint
-  - heap allocations are reduced through encouragement of stack allocations and minimizing re-allocating existing data;
-  - no longer holding onto garbage references (allowing the garbage collector to better do its job and avoiding additional heap allocations);
-  - minimizing unnecessary allocations by handling well-known situations (including hashing segments of strings without allocating new strings and avoiding allocations per-diff line when serializing patch files).
-- and an extremely optimized execution speed.
-  - `TokenMapper` features the hottest code paths, resolved in part by heavy use of caching;
-  - as mentioned before, string slicing is avoided in favor of hashing ranges explicitly;
-  - setting knowable capacities to avoid copying.
+This projects iterates over `DiffPatch` significantly, greatly improving execution speeds and minimizing memory consumption.
