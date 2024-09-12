@@ -11,7 +11,7 @@ This project *works*, and, from my testing, it works *well*. That being said, th
 This projects iterates over `DiffPatch` significantly, boasting:
 
 - a considerably smaller memory footprint
-  - stack allocations are encouraged by making unnecessarily-instanced data static and changing various data structures to structs;
+  - heap allocations are reduced through encouragement of stack allocations and minimizing re-allocating existing data;
   - no longer holding onto garbage references (allowing the garbage collector to better do its job and avoiding additional heap allocations);
   - minimizing unnecessary allocations by handling well-known situations (including hashing segments of strings without allocating new strings and avoiding allocations per-diff line when serializing patch files).
 - and an extremely optimized execution speed.
