@@ -30,6 +30,44 @@ public sealed class TokenMapper
         public int Length => End - Start;
     }
 
+    /// <summary>
+    ///     Wrapper over an array and list, providing an API to access elements
+    ///     and add to the list with no knowledge of any other underlying data.
+    ///     <br />
+    ///     This is used specifically to optimize allocations by providing an
+    ///     object with some pre-initialized data stored in array at the head.
+    /// </summary>
+    /// <typeparam name="T">The type.</typeparam>
+    private sealed class PseudoList<T>(T[] one)
+    {
+        private readonly List<T> two       = [];
+        private readonly int     oneBounds = one.Length;
+
+        /// <summary>
+        ///     Gets the number of elements contained in the list.
+        /// </summary>
+        public int Count => oneBounds + two.Count;
+
+        /// <summary>
+        ///     Gets the element at the specified index.
+        /// </summary>
+        /// <param name="index">
+        ///     The zero-based index of the element to get.
+        /// </param>
+        public T this[int index] => index < oneBounds ? one[index] : two[index - oneBounds];
+
+        /// <summary>
+        ///     Adds an item to the list.
+        /// </summary>
+        /// <param name="item">
+        ///     The object to add to the list.
+        /// </param>
+        public void Add(T item)
+        {
+            two.Add(item);
+        }
+    }
+
     [PublicAPI]
     public int MaxLineId
     {
@@ -42,7 +80,7 @@ public sealed class TokenMapper
         [PublicAPI] get => idToWord.Count;
     }
 
-    private readonly List<string>               idToLine = [..cached_lines_to_ids];
+    private readonly PseudoList<string>         idToLine = new(cached_lines_to_ids);
     private readonly Dictionary<string, ushort> lineToId = [];
 
     private readonly List<string>            idToWord = [];
