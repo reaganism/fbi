@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 using JetBrains.Annotations;
 
 namespace Reaganism.FBI;
@@ -42,6 +44,7 @@ public readonly record struct Operation
 
     private Operation(string linePrefix)
     {
+        Debug.Assert(linePrefix.Length == 1);
         LinePrefix = linePrefix;
     }
 }
