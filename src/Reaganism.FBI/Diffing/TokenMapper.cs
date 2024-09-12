@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
@@ -85,23 +84,9 @@ public sealed class TokenMapper
     /// <param name="word">The word to add.</param>
     /// <returns>The unique ID for the word.</returns>
     [PublicAPI]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public ushort AddWord(string word)
     {
-        /*if (word.Length == 1 && word[0] <= 0x80)
-        {
-            // Use ASCII characters as-is.
-            return word[0];
-        }
-
-        if (wordToId.TryGetValue(word, out var id))
-        {
-            return id;
-        }
-
-        wordToId.Add(word, id = (ushort)idToWord.Count);
-        idToWord.Add(word);
-        return id;*/
-
         return AddWord(word, new SimpleRange(0, word.Length));
     }
 
@@ -113,10 +98,17 @@ public sealed class TokenMapper
             return word[range.Start];
         }
 
+#if false
         var hash = GetSlicedStringHashCode(word, range);
         {
-            Debug.Assert(GetSlicedStringHashCode(word, range) == word[range.Start..range.End].GetHashCode());
+            System.Diagnostics.Debug.Assert(
+                GetSlicedStringHashCode(word, range) == word[range.Start..range.End].GetHashCode()
+            );
         }
+#else
+        var hash = GetSlicedStringHashCode(word, range);
+#endif
+
         if (wordToId.TryGetValue(hash, out var id))
         {
             return id;
@@ -141,18 +133,16 @@ public sealed class TokenMapper
             return cached;
         }
 
-        var b      = 0;
-        var length = line.Length;
-
-        // Inlined from EnumerateWords (see commented declaration for reasons).
+        var bufLength = 0;
+        var length    = line.Length;
         for (var i = 0; i < length;)
         {
             var start = i;
-            var c     = line[i++];
+            var curr  = line[i++];
 
             // Search for different "word" types: words, numbers, whitespace,
             // and symbols.
-            if (char.IsLetter(c))
+            if (char.IsLetter(curr))
             {
                 // If we start with a character, begin resolving an entire word.
                 // A word must start with a letter and may contain letters or
@@ -162,7 +152,7 @@ public sealed class TokenMapper
                     i++;
                 }
             }
-            else if (char.IsDigit(c))
+            else if (char.IsDigit(curr))
             {
                 // If we start with a digit, begin resolving an entire number.
                 // A number must start with a digit and may contain only digits.
@@ -171,13 +161,13 @@ public sealed class TokenMapper
                     i++;
                 }
             }
-            else if (c is ' ' or '\t')
+            else if (curr is ' ' or '\t')
             {
                 // If we start with whitespace, begin resolving all contiguous
                 // whitespace characters of that type.  To maintain
                 // compatibility with Chicken-Bones/DiffPatch diffs, we only
                 // handle spaces and tabs.
-                while (i < length && line[i] == c)
+                while (i < length && line[i] == curr)
                 {
                     i++;
                 }
@@ -189,16 +179,16 @@ public sealed class TokenMapper
             // character.
             // yield return new Range(start, i);
             {
-                if (b >= buf.Length)
+                if (bufLength >= buf.Length)
                 {
                     Array.Resize(ref buf, buf.Length * 2);
                 }
 
-                buf[b++] = (char)AddWord(line, new SimpleRange(start, i));
+                buf[bufLength++] = (char)AddWord(line, new SimpleRange(start, i));
             }
         }
 
-        return wordsToIdsCache[line] = new string(buf, 0, b);
+        return wordsToIdsCache[line] = new string(buf, 0, bufLength);
     }
 
     /// <summary>
@@ -222,65 +212,6 @@ public sealed class TokenMapper
     {
         return idToWord[id];
     }
-
-    // EnumerateWords is inlined into WordsToIds directly to avoid heap
-    // allocations and additional overhead (WordsToIds is an immensely hot code
-    // path).
-    /*
-    /// <summary>
-    ///     Enumerates the words in a line, yielding ranges for each word or
-    ///     symbol.
-    /// </summary>
-    /// <param name="line">The line of text to process.</param>
-    /// <returns>A collection of ranges representing words or symbols.</returns>
-    private static IEnumerable<Range> EnumerateWords(string line)
-    {
-        for (var i = 0; i < line.Length;)
-        {
-            var start = i;
-            var c     = line[i++];
-
-            // Search for different "word" types: words, numbers, whitespace,
-            // and symbols.
-            if (char.IsLetter(c))
-            {
-                // If we start with a character, begin resolving an entire word.
-                // A word must start with a letter and may contain letters or
-                // digits.
-                while (i < line.Length && char.IsLetterOrDigit(line, i))
-                {
-                    i++;
-                }
-            }
-            else if (char.IsDigit(c))
-            {
-                // If we start with a digit, begin resolving an entire number.
-                // A number must start with a digit and may contain only digits.
-                while (i < line.Length && char.IsDigit(line, i))
-                {
-                    i++;
-                }
-            }
-            else if (c is ' ' or '\t')
-            {
-                // If we start with whitespace, begin resolving all contiguous
-                // whitespace characters of that type.  To maintain
-                // compatibility with Chicken-Bones/DiffPatch diffs, we only
-                // handle spaces and tabs.
-                while (i < line.Length && line[i] == c)
-                {
-                    i++;
-                }
-            }
-
-            // Return the resolved range.  If a character is not a supported
-            // whitespace character, a letter, or a digit, it also falls through
-            // here.  This means that symbols will consist of only a single
-            // character.
-            yield return new Range(start, i);
-        }
-    }
-    */
 
     // Mirrors the .NET 8 String::GetHashCode implementation but specifically
     // computes only the hash of a specific character range within the string.
