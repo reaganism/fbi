@@ -50,7 +50,7 @@ public sealed class TokenMapper
 
     private readonly Dictionary<string, string> wordsToIdsCache = [];
 
-    private int    idToLineCount = 0x80 + 1;
+    private ushort idToLineCount = 0x80 + 1;
     private char[] buf           = new char[4096];
 
     [PublicAPI]
@@ -69,7 +69,7 @@ public sealed class TokenMapper
             return id;
         }
 
-        lineToId.Add(line, id = (ushort)idToLineCount);
+        lineToId.Add(line, id = idToLineCount);
         idToLineCount++;
         return id;
     }
