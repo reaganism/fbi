@@ -115,6 +115,7 @@ internal static class DiffHelper
     }
 }
 
+[MemoryDiagnoser]
 public class TerrariaSourceCodeSingleProjectDiffBenchmark
 {
     private static readonly DifferSettings settings = new(
@@ -135,6 +136,7 @@ public class TerrariaSourceCodeSingleProjectDiffBenchmark
     }
 }
 
+[MemoryDiagnoser]
 public class TerrariaSourceCodeMultipleProjectsDiffBenchmark
 {
     private static readonly DifferSettings[] settings =
