@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 
+using Reaganism.FBI.Utility;
+
 namespace Reaganism.FBI.Textual.Fuzzy;
 
 /// <summary>

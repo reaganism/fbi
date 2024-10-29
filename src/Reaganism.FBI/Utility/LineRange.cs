@@ -5,7 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
-namespace Reaganism.FBI;
+namespace Reaganism.FBI.Utility;
 
 /// <summary>
 ///     Describes an inclusive-exclusive range of lines.

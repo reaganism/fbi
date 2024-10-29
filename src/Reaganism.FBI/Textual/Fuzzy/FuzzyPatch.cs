@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
+using Reaganism.FBI.Utility;
+
 namespace Reaganism.FBI.Textual.Fuzzy;
 
 /// <summary>
