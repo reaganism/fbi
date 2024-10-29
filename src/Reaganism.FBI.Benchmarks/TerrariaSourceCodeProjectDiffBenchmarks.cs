@@ -118,8 +118,8 @@ internal static class DiffHelper
 public class TerrariaSourceCodeSingleProjectDiffBenchmark
 {
     private static readonly DifferSettings settings = new(
-        "benchmark-files/terraria-sources/TerrariaClientWindows",
-        "benchmark-files/terraria-sources/TerrariaClientLinux"
+        "TerrariaClientWindows",
+        "TerrariaClientLinux"
     );
 
     [Benchmark]
@@ -140,24 +140,24 @@ public class TerrariaSourceCodeMultipleProjectsDiffBenchmark
     private static readonly DifferSettings[] settings =
     [
         new(
-            "benchmark-files/terraria-sources/TerrariaClientWindows",
-            "benchmark-files/terraria-sources/TerrariaClientLinux"
+            "TerrariaClientWindows",
+            "TerrariaClientLinux"
         ),
         new(
-            "benchmark-files/terraria-sources/TerrariaClientWindows",
-            "benchmark-files/terraria-sources/TerrariaClientMac"
+            "TerrariaClientWindows",
+            "TerrariaClientMac"
         ),
         new(
-            "benchmark-files/terraria-sources/TerrariaClientWindows",
-            "benchmark-files/terraria-sources/TerrariaServerWindows"
+            "TerrariaClientWindows",
+            "TerrariaServerWindows"
         ),
         new(
-            "benchmark-files/terraria-sources/TerrariaServerWindows",
-            "benchmark-files/terraria-sources/TerrariaServerLinux"
+            "TerrariaServerWindows",
+            "TerrariaServerLinux"
         ),
         new(
-            "benchmark-files/terraria-sources/TerrariaServerWindows",
-            "benchmark-files/terraria-sources/TerrariaServerMac"
+            "TerrariaServerWindows",
+            "TerrariaServerMac"
         ),
     ];
 

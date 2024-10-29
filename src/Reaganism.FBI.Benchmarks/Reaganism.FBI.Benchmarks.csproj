@@ -16,4 +16,10 @@
         <ProjectReference Include="..\Reaganism.FBI\Reaganism.FBI.csproj"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <Content Include="../benchmark-files/terraria-sources/**">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
+
 </Project>
