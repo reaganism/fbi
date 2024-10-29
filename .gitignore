@@ -6,3 +6,9 @@ bin/
 obj/
 
 *.user
+
+BenchmarkDotNet.Artifacts/
+
+# Contact me if you want access to these to reproduce benchmarks.  These are
+# technically copyrighted, so I can't publish them directly.
+src/benchmark-files/terraria-sources/
