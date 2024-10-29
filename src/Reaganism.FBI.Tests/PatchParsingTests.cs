@@ -1,3 +1,5 @@
+using Reaganism.FBI.Textual.Fuzzy;
+
 namespace Reaganism.FBI.Tests;
 
 [TestFixture]
@@ -123,7 +125,7 @@ public static class PatchParsingTests
         // Not necessary with raw strings.
         // text = text.Trim();
 
-        var patchFile = PatchFile.FromText(text);
+        var patchFile = FuzzyPatchFile.FromText(text);
         var output    = patchFile.ToString(true);
 
         Assert.That(output, Is.EqualTo(text));

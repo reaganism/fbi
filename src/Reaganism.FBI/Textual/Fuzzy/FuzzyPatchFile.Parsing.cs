@@ -123,7 +123,7 @@ partial record struct FuzzyPatchFile
                     {
                         Start1  = int.Parse(match.Groups[1].Value) - 1,
                         Length1 = int.Parse(match.Groups[2].Value),
-                        Start2  = int.Parse(match.Groups[3].Value) - 1,
+                        Length2 = int.Parse(match.Groups[4].Value),
                     };
 
                     // Range2 start may be automatically determined.
