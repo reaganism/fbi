@@ -27,4 +27,8 @@
         <ProjectReference Include="..\System.Private.CoreLib\System.Private.CoreLib.csproj" PrivateAssets="All" Private="False"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Binary\" />
+    </ItemGroup>
+
 </Project>
