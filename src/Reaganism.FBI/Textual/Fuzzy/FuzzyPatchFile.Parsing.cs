@@ -137,7 +137,7 @@ partial record struct FuzzyPatchFile
 
                         if (verifyHeaders && patch.Start2 != patch.Start1 + delta)
                         {
-                            throw new InvalidDataException($"APplied offset mismatch; expected: {patch.Start1 + delta + 1}, actual: {patch.Start2 + 1}");
+                            throw new InvalidDataException($"Applied offset mismatch; expected: {patch.Start1 + delta + 1}, actual: {patch.Start2 + 1}");
                         }
                     }
 
