@@ -9,10 +9,10 @@
 
     <ItemGroup>
         <PackageReference Include="BenchmarkDotNet" Version="0.14.0"/>
-        <PackageReference Include="CodeChicken.DiffPatch" Version="1.1.0"/>
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\benchmark-files\DiffPatch\DiffPatch.csproj"/>
         <ProjectReference Include="..\Reaganism.FBI\Reaganism.FBI.csproj"/>
     </ItemGroup>
 
