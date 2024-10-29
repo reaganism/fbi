@@ -1,3 +1,5 @@
+using Reaganism.FBI.Textual.Fuzzy;
+
 namespace Reaganism.FBI.Tests;
 
 [TestFixture]
