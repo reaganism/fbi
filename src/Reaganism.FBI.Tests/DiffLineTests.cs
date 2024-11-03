@@ -1,3 +1,5 @@
+using System;
+
 using Reaganism.FBI.Textual.Fuzzy;
 using Reaganism.FBI.Utilities;
 
@@ -11,7 +13,7 @@ public static class DiffLineTests
     {
         const string text = "Test";
 
-        var diff = new FuzzyDiffLine(FuzzyOperation.DELETE, Utf16String.FromReference(text));
+        var diff = new FuzzyDiffLine(FuzzyOperation.DELETE, Utf16String.FromSpan(text.AsSpan()));
 
         Assert.Multiple(
             () =>
@@ -28,7 +30,7 @@ public static class DiffLineTests
     {
         const string text = "Test";
 
-        var diff = new FuzzyDiffLine(FuzzyOperation.INSERT, Utf16String.FromReference(text));
+        var diff = new FuzzyDiffLine(FuzzyOperation.INSERT, Utf16String.FromSpan(text.AsSpan()));
 
         Assert.Multiple(
             () =>
@@ -45,7 +47,7 @@ public static class DiffLineTests
     {
         const string text = "Test";
 
-        var diff = new FuzzyDiffLine(FuzzyOperation.EQUALS, Utf16String.FromReference(text));
+        var diff = new FuzzyDiffLine(FuzzyOperation.EQUALS, Utf16String.FromSpan(text.AsSpan()));
 
         Assert.Multiple(
             () =>

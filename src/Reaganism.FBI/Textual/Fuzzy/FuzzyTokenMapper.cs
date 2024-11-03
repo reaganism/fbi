@@ -24,7 +24,7 @@ public sealed class FuzzyTokenMapper
     private readonly List<Utf16String>       idToWord = [];
     private readonly Dictionary<int, ushort> wordToid = [];
 
-    private readonly Dictionary<Utf16String, Utf16String> wordsToIdsCache = [];
+    private readonly Dictionary<Utf16String, string> wordsToIdsCache = [];
 
     private ushort idToLineCount = 0x80 + 1;
     private char[] buf           = new char[4096];
@@ -69,7 +69,7 @@ public sealed class FuzzyTokenMapper
     }
 
     [PublicAPI]
-    public Utf16String WordsToIds(Utf16String line)
+    public string WordsToIds(Utf16String line)
     {
         if (wordsToIdsCache.TryGetValue(line, out var cached))
         {
@@ -132,7 +132,7 @@ public sealed class FuzzyTokenMapper
             }
         }
 
-        return wordsToIdsCache[line] = Utf16String.FromReference(new string(buf, 0, bufLength));
+        return wordsToIdsCache[line] = new string(buf, 0, bufLength);
     }
 
     /// <summary>

@@ -41,15 +41,15 @@ internal sealed class FuzzyMatchMatrix
     {
         public MatchNode[] Nodes { get; }
 
-        private readonly int                        patternLength;
-        private readonly IReadOnlyList<Utf16String> pattern;
-        private readonly IReadOnlyList<Utf16String> search;
-        private readonly LineRange                  range;
+        private readonly int                   patternLength;
+        private readonly IReadOnlyList<string> pattern;
+        private readonly IReadOnlyList<string> search;
+        private readonly LineRange             range;
 
         public StraightMatch(
-            IReadOnlyList<Utf16String> pattern,
-            IReadOnlyList<Utf16String> search,
-            LineRange                  range
+            IReadOnlyList<string> pattern,
+            IReadOnlyList<string> search,
+            LineRange             range
         )
         {
             patternLength = pattern.Count;
@@ -110,10 +110,10 @@ internal sealed class FuzzyMatchMatrix
     private int firstNode;
 
     public FuzzyMatchMatrix(
-        IReadOnlyList<Utf16String> pattern,
-        IReadOnlyList<Utf16String> search,
-        int                        maxOffset = DEFAULT_MAX_OFFSET,
-        LineRange?                 range     = null
+        IReadOnlyList<string> pattern,
+        IReadOnlyList<string> search,
+        int                   maxOffset = DEFAULT_MAX_OFFSET,
+        LineRange?            range     = null
     )
     {
         range ??= new LineRange().WithLength(search.Count);

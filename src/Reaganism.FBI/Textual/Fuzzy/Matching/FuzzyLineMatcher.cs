@@ -17,9 +17,9 @@ internal sealed class FuzzyLineMatcher
     public float MinMatchScore { get; set; } = DEFAULT_MIN_MATCH_SCORE;
 
     public void MatchLinesByWords(
-        int[]                      matches,
-        IReadOnlyList<Utf16String> wmLines1,
-        IReadOnlyList<Utf16String> wmLines2
+        int[]                 matches,
+        IReadOnlyList<string> wmLines1,
+        IReadOnlyList<string> wmLines2
     )
     {
         foreach (var (range1, range2) in FuzzyLineMatching.UnmatchedRanges(matches, wmLines2.Count))
@@ -41,8 +41,8 @@ internal sealed class FuzzyLineMatcher
     }
 
     public int[] Match(
-        IReadOnlyList<Utf16String> pattern,
-        IReadOnlyList<Utf16String> search
+        IReadOnlyList<string> pattern,
+        IReadOnlyList<string> search
     )
     {
         if (search.Count < pattern.Count)
@@ -90,9 +90,9 @@ internal sealed class FuzzyLineMatcher
     }
 
     // Assumes the lines are in word-to-char mode.
-    public static float MatchLines(Utf16String s, Utf16String t)
+    public static float MatchLines(string s, string t)
     {
-        var d = Utf16String.LevenshteinDistance(s, t);
+        var d = LevenshteinDistance(s, t);
         if (d == 0)
         {
             // Perfect match!
@@ -101,5 +101,62 @@ internal sealed class FuzzyLineMatcher
 
         var max = Math.Max(s.Length, t.Length) / 2f;
         return Math.Max(0f, 1f - (d / max));
+    }
+
+    internal static int LevenshteinDistance(string s, string t)
+    {
+        // Degenerate cases.
+        if (s == t)
+        {
+            return 0;
+        }
+
+        if (s.Length == 0)
+        {
+            return t.Length;
+        }
+
+        if (t.Length == 0)
+        {
+            return s.Length;
+        }
+
+        // Create two work vectors of integer distances.
+        var v0 = (Span<int>)stackalloc int[t.Length + 1]; // Previous
+        var v1 = (Span<int>)stackalloc int[t.Length + 1]; // Current
+
+        // Initialize v1 (the current row of distances).  This row is
+        // A[0][i]: edit distance for an empty `s`.  The distance is just
+        // the number of characters to delete from `t`.
+        for (var i = 0; i < v1.Length; i++)
+        {
+            v1[i] = i;
+        }
+
+        for (var i = 0; i < s.Length; i++)
+        {
+            // Swap v1 to v0, reuse old v0 as new v1.
+            var temp = v0;
+            v0 = v1;
+            v1 = temp;
+
+            // Calculate v1 (current row distances) from the previous row
+            // v0.
+
+            // First element of v1 is A[i + 1][0].  Edit distance is delete
+            // (i + 1) chars from `s` to match empty `t`.
+            v1[0] = i + 1;
+
+            // Use formulate to fill in the rest of the row.
+            for (var j = 0; j < t.Length; j++)
+            {
+                var del = v0[j + 1] + 1;
+                var ins = v1[j]     + 1;
+                var sub = v0[j]     + (s[i] == t[j] ? 0 : 1);
+                v1[j + 1] = Math.Min(del, Math.Min(ins, sub));
+            }
+        }
+
+        return v1[t.Length];
     }
 }

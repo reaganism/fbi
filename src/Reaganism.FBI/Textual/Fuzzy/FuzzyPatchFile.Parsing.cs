@@ -32,7 +32,7 @@ partial record struct FuzzyPatchFile
         bool   verifyHeaders = true
     )
     {
-        return FromLines(patchText.Split('\n').Select(x => Utf16String.FromReference(x.TrimEnd('\r'))), verifyHeaders);
+        return FromLines(patchText.Split('\n').Select(x => Utf16String.FromSpan(x.TrimEnd('\r').AsSpan())), verifyHeaders);
     }
 
     /// <summary>
@@ -51,7 +51,7 @@ partial record struct FuzzyPatchFile
         bool                verifyHeaders = true
     )
     {
-        return FromLines(lines.Select(Utf16String.FromReference), verifyHeaders);
+        return FromLines(lines.Select(x => Utf16String.FromSpan(x.AsSpan())), verifyHeaders);
     }
 
     /// <summary>

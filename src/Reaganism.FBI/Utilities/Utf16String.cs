@@ -126,28 +126,13 @@ public readonly unsafe struct Utf16String : IEquatable<Utf16String>
     }
 
     /// <summary>
-    ///     Creates a <see cref="Utf16String"/> from a <see cref="string"/>
+    ///     Creates a <see cref="Utf16String"/> from a <see cref="Span{T}"/>
     ///     without copying the data.
     /// </summary>
-    /// <param name="value">The <see cref="string"/>.</param>
+    /// <param name="value">The <see cref="Span{T}"/>.</param>
     /// <returns>The <see cref="Utf16String"/>.</returns>
     [PublicAPI]
-    public static Utf16String FromReference(string value)
-    {
-        fixed (char* pValue = &value.GetPinnableReference())
-        {
-            return new Utf16String(pValue, value.Length);
-        }
-    }
-
-    /// <summary>
-    ///     Creates a <see cref="Utf16String"/> from a <see cref="char"/> array
-    ///     without copying the data.
-    /// </summary>
-    /// <param name="value">The array.</param>
-    /// <returns>The <see cref="Utf16String"/>.</returns>
-    [PublicAPI]
-    public static Utf16String FromArray(char[] value)
+    public static Utf16String FromSpan(Span<char> value)
     {
         fixed (char* pValue = value)
         {
@@ -156,13 +141,13 @@ public readonly unsafe struct Utf16String : IEquatable<Utf16String>
     }
 
     /// <summary>
-    ///     Creates a <see cref="Utf16String"/> from a <see cref="Span{T}"/>
-    ///     without copying the data.
+    ///     Creates a <see cref="Utf16String"/> from a
+    ///     <see cref="ReadOnlySpan{T}"/> without copying the data.
     /// </summary>
-    /// <param name="value">The <see cref="Span{T}"/>.</param>
+    /// <param name="value">The <see cref="ReadOnlySpan{T}"/>.</param>
     /// <returns>The <see cref="Utf16String"/>.</returns>
     [PublicAPI]
-    public static Utf16String FromSpan(Span<char> value)
+    public static Utf16String FromSpan(ReadOnlySpan<char> value)
     {
         fixed (char* pValue = value)
         {
@@ -180,63 +165,6 @@ public readonly unsafe struct Utf16String : IEquatable<Utf16String>
     public static bool operator !=(Utf16String left, Utf16String right)
     {
         return !(left == right);
-    }
-
-    internal static int LevenshteinDistance(Utf16String s, Utf16String t)
-    {
-        // Degenerate cases.
-        if (s == t)
-        {
-            return 0;
-        }
-
-        if (s.Length == 0)
-        {
-            return t.Length;
-        }
-
-        if (t.Length == 0)
-        {
-            return s.Length;
-        }
-
-        // Create two work vectors of integer distances.
-        var v0 = (Span<int>)stackalloc int[t.Length + 1]; // Previous
-        var v1 = (Span<int>)stackalloc int[t.Length + 1]; // Current
-
-        // Initialize v1 (the current row of distances).  This row is
-        // A[0][i]: edit distance for an empty `s`.  The distance is just
-        // the number of characters to delete from `t`.
-        for (var i = 0; i < v1.Length; i++)
-        {
-            v1[i] = i;
-        }
-
-        for (var i = 0; i < s.Length; i++)
-        {
-            // Swap v1 to v0, reuse old v0 as new v1.
-            var temp = v0;
-            v0 = v1;
-            v1 = temp;
-
-            // Calculate v1 (current row distances) from the previous row
-            // v0.
-
-            // First element of v1 is A[i + 1][0].  Edit distance is delete
-            // (i + 1) chars from `s` to match empty `t`.
-            v1[0] = i + 1;
-
-            // Use formulate to fill in the rest of the row.
-            for (var j = 0; j < t.Length; j++)
-            {
-                var del = v0[j + 1] + 1;
-                var ins = v1[j]     + 1;
-                var sub = v0[j]     + (s.Span[i] == t.Span[j] ? 0 : 1);
-                v1[j + 1] = Math.Min(del, Math.Min(ins, sub));
-            }
-        }
-
-        return v1[t.Length];
     }
 }
 

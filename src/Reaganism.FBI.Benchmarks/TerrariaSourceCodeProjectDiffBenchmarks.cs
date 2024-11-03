@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -62,7 +63,10 @@ internal static class DiffHelper
         // Is this size excessive?
         const long max_file_bytes_for_stack = 1024 * 5;
 
-        Utf16String originalText;
+        var refOriginalText = "";
+        var refModifiedText = "";
+
+        var originalText = default(Utf16String?);
         {
             var originalPath = Path.Combine(settings.OriginalDirectory, relativePath).Replace('\\', '/');
             var originalInfo = new FileInfo(originalPath);
@@ -79,11 +83,11 @@ internal static class DiffHelper
             }
             else
             {
-                originalText = Utf16String.FromReference(File.ReadAllText(originalPath));
+                refOriginalText = File.ReadAllText(originalPath);
             }
         }
 
-        Utf16String modifiedText;
+        var modifiedText = default(Utf16String?);
         {
             var modifiedPath = Path.Combine(settings.ModifiedDirectory, relativePath).Replace('\\', '/');
             var modifiedInfo = new FileInfo(modifiedPath);
@@ -100,15 +104,24 @@ internal static class DiffHelper
             }
             else
             {
-                modifiedText = Utf16String.FromReference(File.ReadAllText(modifiedPath));
+                refModifiedText = File.ReadAllText(modifiedPath);
             }
         }
 
-        _ = FuzzyDiffer.DiffTexts(
-            new LineMatchedDiffer(),
-            SplitText(originalText),
-            SplitText(modifiedText)
-        );
+        fixed (char* pOriginalText = refOriginalText)
+        {
+            fixed (char* pModifiedText = refModifiedText)
+            {
+                originalText ??= Utf16String.FromSpan(new Span<char>(pOriginalText, refOriginalText.Length));
+                modifiedText ??= Utf16String.FromSpan(new Span<char>(pModifiedText, refModifiedText.Length));
+
+                _ = FuzzyDiffer.DiffTexts(
+                    new LineMatchedDiffer(),
+                    SplitText(originalText.Value),
+                    SplitText(modifiedText.Value)
+                );
+            }
+        }
     }
 
     private static IReadOnlyList<Utf16String> SplitText(Utf16String text)
@@ -137,7 +150,7 @@ internal static class DiffHelper
         {
             lines.Add(text.Slice(start, text.Length - start));
         }
-        
+
         return lines;
     }
 
