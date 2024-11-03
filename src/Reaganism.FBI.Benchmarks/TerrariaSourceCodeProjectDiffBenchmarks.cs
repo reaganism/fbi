@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 using BenchmarkDotNet.Attributes;
@@ -59,7 +60,7 @@ internal static class DiffHelper
     private static unsafe void DiffFileFbi(DifferSettings settings, string relativePath)
     {
         // Is this size excessive?
-        const long max_file_bytes_for_stack = 1024 * 1024;
+        const long max_file_bytes_for_stack = 1024 * 5;
 
         Utf16String originalText;
         {
@@ -69,10 +70,12 @@ internal static class DiffHelper
             {
                 using var fs = new FileStream(originalPath, FileMode.Open, FileAccess.Read, FileShare.Read);
 
-                var pBytes = stackalloc byte[(int)originalInfo.Length];
-                _ = fs.Read(new Span<byte>(pBytes, (int)originalInfo.Length));
+                var pBytes = (Span<byte>)stackalloc byte[(int)originalInfo.Length];
+                var pChars = (Span<char>)stackalloc char[(int)originalInfo.Length];
+                _ = fs.Read(pBytes);
+                Encoding.UTF8.GetChars(pBytes, pChars);
 
-                originalText = Utf16String.FromSpan(new Span<char>(pBytes, (int)originalInfo.Length / 2));
+                originalText = Utf16String.FromSpan(pChars);
             }
             else
             {
@@ -88,10 +91,12 @@ internal static class DiffHelper
             {
                 using var fs = new FileStream(modifiedPath, FileMode.Open, FileAccess.Read, FileShare.Read);
 
-                var pBytes = stackalloc byte[(int)modifiedInfo.Length];
-                _ = fs.Read(new Span<byte>(pBytes, (int)modifiedInfo.Length));
+                var pBytes = (Span<byte>)stackalloc byte[(int)modifiedInfo.Length];
+                var pChars = (Span<char>)stackalloc char[(int)modifiedInfo.Length];
+                _ = fs.Read(pBytes);
+                Encoding.UTF8.GetChars(pBytes, pChars);
 
-                modifiedText = Utf16String.FromSpan(new Span<char>(pBytes, (int)modifiedInfo.Length / 2));
+                modifiedText = Utf16String.FromSpan(pChars);
             }
             else
             {
