@@ -207,6 +207,6 @@ public class PatienceDiffer(FuzzyTokenMapper? mapper = null) : IDiffer
         var lineModeString1 = Mapper.LinesToIds(originalLines);
         var lineModeString2 = Mapper.LinesToIds(modifiedLines);
 
-        return PatienceMatch.Match(lineModeString1, lineModeString2, mapper.MaxLineId);
+        return PatienceMatch.Match(lineModeString1, lineModeString2, Mapper.MaxLineId);
     }
 }

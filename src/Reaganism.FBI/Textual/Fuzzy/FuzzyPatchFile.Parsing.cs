@@ -175,7 +175,7 @@ partial record struct FuzzyPatchFile
                     break;
 
                 default:
-                    throw new InvalidDataException($"Invalid line({i}): {line}");
+                    throw new InvalidDataException($"Invalid line({i}): {span}");
             }
         }
 

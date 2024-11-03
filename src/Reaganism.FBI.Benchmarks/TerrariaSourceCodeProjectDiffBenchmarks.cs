@@ -1,9 +1,15 @@
+using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 
 using BenchmarkDotNet.Attributes;
 
-using Reaganism.FBI.Diffing;
+using Reaganism.FBI.Textual.Fuzzy.Diffing;
+using Reaganism.FBI.Utilities;
 
 namespace Reaganism.FBI.Benchmarks;
 
@@ -50,13 +56,83 @@ internal static class DiffHelper
         Execute(actions);
     }
 
-    private static void DiffFileFbi(DifferSettings settings, string relativePath)
+    private static unsafe void DiffFileFbi(DifferSettings settings, string relativePath)
     {
-        _ = Differ.DiffFiles(
+        // Is this size excessive?
+        const long max_file_bytes_for_stack = 1024 * 1024;
+
+        Utf16String originalText;
+        {
+            var originalPath = Path.Combine(settings.OriginalDirectory, relativePath).Replace('\\', '/');
+            var originalInfo = new FileInfo(originalPath);
+            if (originalInfo.Length <= max_file_bytes_for_stack)
+            {
+                using var fs = new FileStream(originalPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+
+                var pBytes = stackalloc byte[(int)originalInfo.Length];
+                _ = fs.Read(new Span<byte>(pBytes, (int)originalInfo.Length));
+
+                originalText = Utf16String.FromSpan(new Span<char>(pBytes, (int)originalInfo.Length / 2));
+            }
+            else
+            {
+                originalText = Utf16String.FromReference(File.ReadAllText(originalPath));
+            }
+        }
+
+        Utf16String modifiedText;
+        {
+            var modifiedPath = Path.Combine(settings.ModifiedDirectory, relativePath).Replace('\\', '/');
+            var modifiedInfo = new FileInfo(modifiedPath);
+            if (modifiedInfo.Length <= max_file_bytes_for_stack)
+            {
+                using var fs = new FileStream(modifiedPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+
+                var pBytes = stackalloc byte[(int)modifiedInfo.Length];
+                _ = fs.Read(new Span<byte>(pBytes, (int)modifiedInfo.Length));
+
+                modifiedText = Utf16String.FromSpan(new Span<char>(pBytes, (int)modifiedInfo.Length / 2));
+            }
+            else
+            {
+                modifiedText = Utf16String.FromReference(File.ReadAllText(modifiedPath));
+            }
+        }
+
+        _ = FuzzyDiffer.DiffTexts(
             new LineMatchedDiffer(),
-            Path.Combine(settings.OriginalDirectory, relativePath).Replace('\\', '/'),
-            Path.Combine(settings.ModifiedDirectory, relativePath).Replace('\\', '/')
+            SplitText(originalText),
+            SplitText(modifiedText)
         );
+    }
+
+    private static IReadOnlyList<Utf16String> SplitText(Utf16String text)
+    {
+        var span = text.Span;
+
+        var lines = new List<Utf16String>();
+
+        var start = 0;
+        for (var i = 0; i < text.Length; i++)
+        {
+            if (span[i] == '\r' || span[i] == '\n')
+            {
+                lines.Add(text[start..i]);
+                start = i + 1;
+
+                if (span[i] == '\r' && i + 1 < text.Length && span[i + 1] == '\n')
+                {
+                    i++;
+                }
+            }
+        }
+
+        if (start < text.Length)
+        {
+            lines.Add(text[start..]);
+        }
+
+        return lines;
     }
 
     private static void DiffFileCodeChicken(DifferSettings settings, string relativePath)
