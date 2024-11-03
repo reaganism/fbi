@@ -25,13 +25,9 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\System.Private.CoreLib\System.Private.CoreLib.csproj" PrivateAssets="All" Private="False"/>
-    </ItemGroup>
-
-    <ItemGroup>
         <Folder Include="Binary\"/>
         <Folder Include="Textual\Fuzzy\Diffing\"/>
-        <Folder Include="Textual\Fuzzy\Matching\" />
+        <Folder Include="Textual\Fuzzy\Matching\"/>
         <Folder Include="Textual\Fuzzy\Patching\"/>
     </ItemGroup>
 
