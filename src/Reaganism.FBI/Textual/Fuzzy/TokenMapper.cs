@@ -20,7 +20,7 @@ internal sealed class TokenMapper
     private readonly List<Utf16String>       idToWord = [];
     private readonly Dictionary<int, ushort> wordToid = [];
 
-    private readonly Dictionary<Utf16String, string> wordsToIdsCache = [];
+    private readonly Dictionary<Utf16String, Utf16String> wordsToIdsCache = [];
 
     private ushort idToLineCount = 0x80 + 1;
     private char[] buf           = new char[4096];
@@ -62,7 +62,7 @@ internal sealed class TokenMapper
         return id;
     }
 
-    public string WordsToIds(Utf16String line)
+    public Utf16String WordsToIds(Utf16String line)
     {
         if (wordsToIdsCache.TryGetValue(line, out var cached))
         {
@@ -125,17 +125,16 @@ internal sealed class TokenMapper
             }
         }
 
-        return wordsToIdsCache[line] = new string(buf, 0, bufLength);
+        return wordsToIdsCache[line] = Utf16String.FromReference(new string(buf, 0, bufLength));
     }
 
     /// <summary>
     ///     Converts a collection of lines into a string of identifiers.
     /// </summary>
     /// <param name="lines">The collection of lines to convert.</param>
-    /// <returns>A string of comma-separated identifiers.</returns>
-    public string LinesToIds(IEnumerable<Utf16String> lines)
+    public ushort[] LinesToIds(IEnumerable<Utf16String> lines)
     {
-        return new string(lines.Select(x => (char)AddLine(x)).ToArray());
+        return lines.Select(AddLine).ToArray();
     }
 
     /// <summary>
