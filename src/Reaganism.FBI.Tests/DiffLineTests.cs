@@ -1,5 +1,3 @@
-using System;
-
 using Reaganism.FBI.Textual.Fuzzy;
 using Reaganism.FBI.Utility;
 
