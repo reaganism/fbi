@@ -1,6 +1,9 @@
-using System;
 using System.Diagnostics;
 using System.Text;
+
+using JetBrains.Annotations;
+
+using Reaganism.FBI.Utility;
 
 namespace Reaganism.FBI.Textual.Fuzzy;
 
@@ -17,6 +20,7 @@ namespace Reaganism.FBI.Textual.Fuzzy;
 ///     <see cref="Append"/> and <see cref="AppendLine"/> to avoid allocating
 ///     the actual text as a new string.
 /// </remarks>
+[PublicAPI]
 public readonly struct FuzzyDiffLine
 {
     // PERF: The actual text of this line is stored as a memory reference.  This
@@ -26,10 +30,11 @@ public readonly struct FuzzyDiffLine
     /// <summary>
     ///     The operation of this line.
     /// </summary>
+    [PublicAPI]
     public FuzzyOperation Operation { get; }
 
-    private readonly ReadOnlyMemory<char> text;
-    private readonly bool                 hasPrefix;
+    private readonly Utf16String text;
+    private readonly bool        hasPrefix;
 
     /// <summary>
     ///     Creates a new <see cref="FuzzyDiffLine"/> with the given operation
@@ -37,7 +42,7 @@ public readonly struct FuzzyDiffLine
     /// </summary>
     /// <param name="operation">The operation.</param>
     /// <param name="text">The text <b>WITHOUT</b> the operation character.</param>
-    public FuzzyDiffLine(FuzzyOperation operation, ReadOnlyMemory<char> text)
+    public FuzzyDiffLine(FuzzyOperation operation, Utf16String text)
     {
         Operation = operation;
         this.text = text;
@@ -49,7 +54,11 @@ public readonly struct FuzzyDiffLine
         hasPrefix = false;
     }
 
-    internal FuzzyDiffLine(FuzzyOperation operation, ReadOnlyMemory<char> text, bool hasPrefix)
+    internal FuzzyDiffLine(
+        FuzzyOperation operation,
+        Utf16String    text,
+        bool           hasPrefix
+    )
     {
         Debug.Assert(
             hasPrefix ? text.Span[0] == operation.LinePrefix : text.Span[0] != operation.LinePrefix,
@@ -62,27 +71,29 @@ public readonly struct FuzzyDiffLine
     }
 
 #region Serialization
-    public void Append(StringBuilder sb)
+    [PublicAPI]
+    public StringBuilder Append(StringBuilder sb)
     {
         if (!hasPrefix)
         {
             sb.Append(Operation.LinePrefix);
         }
 
-        sb.Append(text.Span);
+        return sb.AppendUtf16(text);
     }
 
-    public void AppendLine(StringBuilder sb)
+    [PublicAPI]
+    public StringBuilder AppendLine(StringBuilder sb)
     {
         Append(sb);
-        sb.AppendLine();
+        return sb.AppendLine();
     }
 
     // PERF: Avoid using ToString when possible.  Prefer Append[Line] APIs when
     //       concatenating strings.
     public override string ToString()
     {
-        return hasPrefix ? text.ToString() : Operation.LinePrefix + text.ToString();
+        return hasPrefix ? text.Span.ToString() : Operation.LinePrefix + text.Span.ToString();
     }
 #endregion
 }

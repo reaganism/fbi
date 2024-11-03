@@ -5,6 +5,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
+using JetBrains.Annotations;
+
 namespace Reaganism.FBI.Utility;
 
 /// <summary>
@@ -12,12 +14,14 @@ namespace Reaganism.FBI.Utility;
 /// </summary>
 /// <param name="Start">The starting line index (inclusive).</param>
 /// <param name="End">The ending line index (exclusive).</param>
+[PublicAPI]
 [DebuggerDisplay("{ToString()}")]
 public readonly record struct LineRange(int Start, int End)
 {
     /// <summary>
     ///     The number of lines in the range.
     /// </summary>
+    [PublicAPI]
     public int Length => End - Start;
 
     /// <summary>
@@ -26,6 +30,7 @@ public readonly record struct LineRange(int Start, int End)
     /// <remarks>
     ///     Identical to <see cref="Start"/>.
     /// </remarks>
+    [PublicAPI]
     public int First => Start;
 
     /// <summary>
@@ -34,38 +39,45 @@ public readonly record struct LineRange(int Start, int End)
     /// <remarks>
     ///     Use this to get the actual last line in the range.
     /// </remarks>
+    [PublicAPI]
     public int Last => End - 1;
 
+    [PublicAPI]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LineRange WithLength(int length)
     {
         return this with { End = Start + length };
     }
 
+    [PublicAPI]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LineRange WithFirst(int first)
     {
         return this with { Start = first };
     }
 
+    [PublicAPI]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public LineRange WithLast(int last)
     {
         return this with { End = last + 1 };
     }
 
+    [PublicAPI]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Contains(int index)
     {
         return Start <= index && index < End;
     }
 
+    [PublicAPI]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Contains(LineRange range)
     {
         return Start <= range.Start && range.End <= End;
     }
 
+    [PublicAPI]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Intersects(LineRange range)
     {
@@ -77,7 +89,11 @@ public readonly record struct LineRange(int Start, int End)
         return $"[{Start},{End})";
     }
 
-    public IEnumerable<LineRange> Except(IEnumerable<LineRange> except, bool presorted = false)
+    [PublicAPI]
+    public IEnumerable<LineRange> Except(
+        IEnumerable<LineRange> except,
+        bool                   presorted = false
+    )
     {
         if (!presorted)
         {
@@ -101,16 +117,19 @@ public readonly record struct LineRange(int Start, int End)
         }
     }
 
+    [PublicAPI]
     public static LineRange operator +(LineRange range, int i)
     {
         return new LineRange(Start: range.Start + i, End: range.End + i);
     }
 
+    [PublicAPI]
     public static LineRange operator -(LineRange range, int i)
     {
         return new LineRange(Start: range.Start - i, End: range.End - i);
     }
 
+    [PublicAPI]
     public static implicit operator Range(LineRange range)
     {
         return new Range(Index.FromStart(range.Start), Index.FromStart(range.End));
@@ -119,7 +138,10 @@ public readonly record struct LineRange(int Start, int End)
 
 public static class LineRangeExtensions
 {
-    private sealed class ListSlice<T>(IReadOnlyList<T> list, LineRange range) : IReadOnlyList<T>
+    private sealed class ListSlice<T>(
+        IReadOnlyList<T> list,
+        LineRange        range
+    ) : IReadOnlyList<T>
     {
         IEnumerator<T> IEnumerable<T>.GetEnumerator()
         {
@@ -139,12 +161,21 @@ public static class LineRangeExtensions
         T IReadOnlyList<T>.this[int index] => list[index + range.Start];
     }
 
-    public static IReadOnlyList<T> Slice<T>(this IReadOnlyList<T> @this, int start, int length)
+    [PublicAPI]
+    public static IReadOnlyList<T> Slice<T>(
+        this IReadOnlyList<T> @this,
+        int                   start,
+        int                   length
+    )
     {
         return @this.Slice(new LineRange(start, start + length));
     }
 
-    public static IReadOnlyList<T> Slice<T>(this IReadOnlyList<T> @this, LineRange range)
+    [PublicAPI]
+    public static IReadOnlyList<T> Slice<T>(
+        this IReadOnlyList<T> @this,
+        LineRange             range
+    )
     {
         return range.Start == 0 && range.Length == @this.Count ? @this : new ListSlice<T>(@this, range);
     }

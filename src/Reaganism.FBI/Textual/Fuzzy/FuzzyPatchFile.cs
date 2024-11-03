@@ -1,6 +1,10 @@
 using System.Collections.Generic;
 using System.Text;
 
+using JetBrains.Annotations;
+
+using Reaganism.FBI.Utility;
+
 namespace Reaganism.FBI.Textual.Fuzzy;
 
 /// <summary>
@@ -10,7 +14,12 @@ namespace Reaganism.FBI.Textual.Fuzzy;
 /// <param name="Patches">The patches within the file.</param>
 /// <param name="OriginalPath">The path to the original file.</param>
 /// <param name="ModifiedPath">The path to the modified file.</param>
-public readonly partial record struct FuzzyPatchFile(IEnumerable<FuzzyPatch> Patches, string? OriginalPath, string? ModifiedPath)
+[PublicAPI]
+public readonly partial record struct FuzzyPatchFile(
+    IEnumerable<FuzzyPatch> Patches,
+    Utf16String?            OriginalPath,
+    Utf16String?            ModifiedPath
+)
 {
 #region Serialization
     /// <summary>
@@ -25,7 +34,12 @@ public readonly partial record struct FuzzyPatchFile(IEnumerable<FuzzyPatch> Pat
     /// <param name="modifiedPath">
     ///     The path to the modified file, if you want to override the value.
     /// </param>
-    public string ToString(bool autoOffset, string? originalPath = null, string? modifiedPath = null)
+    [PublicAPI]
+    public string ToString(
+        bool         autoOffset,
+        Utf16String? originalPath = null,
+        Utf16String? modifiedPath = null
+    )
     {
         originalPath ??= OriginalPath;
         modifiedPath ??= ModifiedPath;
@@ -34,8 +48,8 @@ public readonly partial record struct FuzzyPatchFile(IEnumerable<FuzzyPatch> Pat
         {
             if (originalPath is not null && modifiedPath is not null)
             {
-                sb.Append("--- ").AppendLine(originalPath);
-                sb.Append("+++ ").AppendLine(modifiedPath);
+                sb.Append("--- ").AppendUtf16Line(originalPath.Value);
+                sb.Append("+++ ").AppendUtf16Line(modifiedPath.Value);
             }
 
             foreach (var patch in Patches)

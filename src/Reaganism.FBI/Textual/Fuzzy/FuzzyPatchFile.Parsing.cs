@@ -5,6 +5,10 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
+using JetBrains.Annotations;
+
+using Reaganism.FBI.Utility;
+
 namespace Reaganism.FBI.Textual.Fuzzy;
 
 partial record struct FuzzyPatchFile
@@ -22,12 +26,13 @@ partial record struct FuzzyPatchFile
     /// <returns>
     ///     A <see cref="FuzzyPatchFile"/> with the parsed patches.
     /// </returns>
+    [PublicAPI]
     public static FuzzyPatchFile FromText(
         string patchText,
         bool   verifyHeaders = true
     )
     {
-        return FromLines(patchText.Split('\n').Select(x => x.TrimEnd('\r').AsMemory()), verifyHeaders);
+        return FromLines(patchText.Split('\n').Select(x => Utf16String.FromReference(x.TrimEnd('\r'))), verifyHeaders);
     }
 
     /// <summary>
@@ -40,12 +45,13 @@ partial record struct FuzzyPatchFile
     /// <returns>
     ///     A <see cref="FuzzyPatchFile"/> with the parsed patches.
     /// </returns>
+    [PublicAPI]
     public static FuzzyPatchFile FromLines(
         IEnumerable<string> lines,
         bool                verifyHeaders = true
     )
     {
-        return FromLines(lines.Select(x => x.AsMemory()), verifyHeaders);
+        return FromLines(lines.Select(Utf16String.FromReference), verifyHeaders);
     }
 
     /// <summary>
@@ -58,17 +64,18 @@ partial record struct FuzzyPatchFile
     /// <returns>
     ///     A <see cref="FuzzyPatchFile"/> with the parsed patches.
     /// </returns>
+    [PublicAPI]
     public static FuzzyPatchFile FromLines(
-        IEnumerable<ReadOnlyMemory<char>> lines,
-        bool                              verifyHeaders = true
+        IEnumerable<Utf16String> lines,
+        bool                     verifyHeaders = true
     )
     {
         var patches = new List<FuzzyPatch>();
         var patch   = default(FuzzyPatch);
         var delta   = 0;
 
-        var originalPath = default(string);
-        var modifiedPath = default(string);
+        var originalPath = default(Utf16String?);
+        var modifiedPath = default(Utf16String?);
 
         var i = 0;
         foreach (var line in lines)
@@ -90,17 +97,18 @@ partial record struct FuzzyPatchFile
                 // the context.
                 if (patch is null && span[0] != '@')
                 {
-                    if (i == 1 && span.StartsWith("--- "))
+                    switch (i)
                     {
-                        originalPath = line[4..].ToString();
-                    }
-                    else if (i == 2 && span.StartsWith("+++ "))
-                    {
-                        modifiedPath = line[4..].ToString();
-                    }
-                    else
-                    {
-                        throw new InvalidDataException($"Invalid context line({i}): {line}");
+                        case 1 when span.StartsWith("--- "):
+                            originalPath = line[4..];
+                            break;
+
+                        case 2 when span.StartsWith("+++ "):
+                            modifiedPath = line[4..];
+                            break;
+
+                        default:
+                            throw new InvalidDataException($"Invalid context line({i}): {span}");
                     }
 
                     continue;
@@ -116,7 +124,7 @@ partial record struct FuzzyPatchFile
                     var match = hunk_offset_regex.Match(span.ToString());
                     if (!match.Success)
                     {
-                        throw new InvalidDataException($"Invalid hunk offset({i}): {line}");
+                        throw new InvalidDataException($"Invalid hunk offset({i}): {span}");
                     }
 
                     patch = new FuzzyPatch

@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
+using JetBrains.Annotations;
+
 using Reaganism.FBI.Utility;
 
 namespace Reaganism.FBI.Textual.Fuzzy;
@@ -14,11 +16,13 @@ namespace Reaganism.FBI.Textual.Fuzzy;
 ///     under rare cases (in which <see cref="RecalculateLengths"/> should be
 ///     called).  TODO: When?
 /// </remarks>
+[PublicAPI]
 public sealed class FuzzyPatch
 {
     /// <summary>
     ///     The diffs that make up this patch.
     /// </summary>
+    [PublicAPI]
     public List<FuzzyDiffLine> Diffs { get; set; }
 
 #region Ranges
@@ -50,9 +54,11 @@ public sealed class FuzzyPatch
     /// <remarks>
     ///     Cache the result! This is expensive and forces string allocations.
     /// </remarks>
-    public IReadOnlyCollection<string> ContextLines => Diffs.Where(x => x.Operation != FuzzyOperation.INSERT)
-                                                            .Select(x => x.ToString())
-                                                            .ToList();
+    [PublicAPI]
+    public IReadOnlyCollection<string> ContextLines =>
+        Diffs.Where(x => x.Operation != FuzzyOperation.INSERT)
+             .Select(x => x.ToString())
+             .ToList();
 
     /// <summary>
     ///     The patched lines (all lines but DELETE operations) of this patch.
@@ -60,28 +66,34 @@ public sealed class FuzzyPatch
     /// <remarks>
     ///     Cache the result! This is expensive and forces string allocations.
     /// </remarks>
-    public IReadOnlyCollection<string> PatchedLines => Diffs.Where(x => x.Operation != FuzzyOperation.DELETE)
-                                                            .Select(x => x.ToString())
-                                                            .ToList();
+    [PublicAPI]
+    public IReadOnlyCollection<string> PatchedLines =>
+        Diffs.Where(x => x.Operation != FuzzyOperation.DELETE)
+             .Select(x => x.ToString())
+             .ToList();
 
     /// <summary>
     ///     The range of the original file hunk.
     /// </summary>
+    [PublicAPI]
     public LineRange Range1 => new LineRange(Start1, 0).WithLength(Length1);
 
     /// <summary>
     ///     The range of the modified file hunk.
     /// </summary>
+    [PublicAPI]
     public LineRange Range2 => new LineRange(Start2, 0).WithLength(Length2);
 
     /// <summary>
     ///     The trimmed range of the original file hunk.
     /// </summary>
+    [PublicAPI]
     public LineRange TrimmedRange1 => TrimRange(Range1, Diffs);
 
     /// <summary>
     ///     The trimmed range of the modified file hunk.
     /// </summary>
+    [PublicAPI]
     public LineRange TrimmedRange2 => TrimRange(Range2, Diffs);
 #endregion
 
@@ -90,6 +102,7 @@ public sealed class FuzzyPatch
     ///     <paramref name="diffs"/>.
     /// </summary>
     /// <param name="diffs">The diffs of this patch.</param>
+    [PublicAPI]
     public FuzzyPatch(List<FuzzyDiffLine>? diffs = null)
     {
         Diffs = diffs ?? [];
@@ -121,10 +134,11 @@ public sealed class FuzzyPatch
 
     /// <summary>
     ///     Trims the ranges of this patch to the given
-    ///     <paramref name="contextLineCount"/>. Specifically, it removes any
+    ///     <paramref name="contextLineCount"/>.  Specifically, it removes any
     ///     contiguous context lines exceeding the given count.
     /// </summary>
     /// <param name="contextLineCount">The number of context lines.</param>
+    [PublicAPI]
     public void Trim(int contextLineCount)
     {
         var range = TrimRange(new LineRange(0, 0).WithLength(Diffs.Count), Diffs);
@@ -174,6 +188,7 @@ public sealed class FuzzyPatch
     /// <returns>
     ///     A new <see cref="FuzzyPatch"/> with the sorted diff contents.
     /// </returns>
+    [PublicAPI]
     public FuzzyPatch Uncollate()
     {
         // The uncollated list is our processed list of diffs.  This method does
@@ -226,9 +241,9 @@ public sealed class FuzzyPatch
     }
 
     /// <summary>
-    ///     Splits the current patch into multiple, smaller patches. When there
+    ///     Splits the current patch into multiple, smaller patches.  When there
     ///     are fewer context lines, removing extras may result in a single
-    ///     patch fragmenting into multiple. This is because one large patch
+    ///     patch fragmenting into multiple.  This is because one large patch
     ///     may have two diff chunks with context lines that touch or merge with
     ///     each other, creating one large patch, and reducing the amount of
     ///     context results in these chunks no longer being connected (thus
@@ -239,6 +254,7 @@ public sealed class FuzzyPatch
     ///     A collection of patches that are the result of splitting the current
     ///     patch.
     /// </returns>
+    [PublicAPI]
     public IEnumerable<FuzzyPatch> Split(int contextLineCount)
     {
         // We can short-circuit if there are no diffs.
@@ -314,7 +330,10 @@ public sealed class FuzzyPatch
     /// <returns>
     ///     The trimmed <see cref="LineRange"/>.
     /// </returns>
-    private static LineRange TrimRange(LineRange range, List<FuzzyDiffLine> diffs)
+    private static LineRange TrimRange(
+        LineRange           range,
+        List<FuzzyDiffLine> diffs
+    )
     {
         var start = 0;
 

@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 
+using JetBrains.Annotations;
+
 using Reaganism.FBI.Utility;
 
 namespace Reaganism.FBI.Textual.Fuzzy;
@@ -7,6 +9,7 @@ namespace Reaganism.FBI.Textual.Fuzzy;
 /// <summary>
 ///     Provides a way to get the header for a fuzzy patch.
 /// </summary>
+[PublicAPI]
 public static class FuzzyPatchHeader
 {
     private static readonly Dictionary<(LineRange, LineRange), string> auto_headers = [];
@@ -20,6 +23,7 @@ public static class FuzzyPatchHeader
     ///     Whether the insertion offset should be determined automatically.
     /// </param>
     /// <returns>The header.</returns>
+    [PublicAPI]
     public static string GetHeader(FuzzyPatch patch, bool auto)
     {
         return GetHeader(patch.Range1, patch.Range2, auto);
@@ -34,7 +38,12 @@ public static class FuzzyPatchHeader
     ///     Whether the insertion offset should be determined automatically.
     /// </param>
     /// <returns>The header.</returns>
-    public static string GetHeader(LineRange range1, LineRange range2, bool auto)
+    [PublicAPI]
+    public static string GetHeader(
+        LineRange range1,
+        LineRange range2,
+        bool      auto
+    )
     {
         var map = auto ? auto_headers : headers;
 

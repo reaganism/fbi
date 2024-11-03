@@ -1,6 +1,7 @@
 using System;
 
 using Reaganism.FBI.Textual.Fuzzy;
+using Reaganism.FBI.Utility;
 
 namespace Reaganism.FBI.Tests;
 
@@ -12,12 +13,12 @@ public static class DiffLineTests
     {
         const string text = "Test";
 
-        var diff = new FuzzyDiffLine(FuzzyOperation.DELETE, text.AsMemory());
+        var diff = new FuzzyDiffLine(FuzzyOperation.DELETE, Utf16String.FromReference(text));
 
         Assert.Multiple(
             () =>
             {
-                Assert.That(diff.Operation,  Is.EqualTo(FuzzyOperation.DELETE));
+                Assert.That(diff.Operation, Is.EqualTo(FuzzyOperation.DELETE));
                 // Assert.That(diff.Text,       Is.EqualTo(text));
                 Assert.That(diff.ToString(), Is.EqualTo($"-{text}"));
             }
@@ -29,12 +30,12 @@ public static class DiffLineTests
     {
         const string text = "Test";
 
-        var diff = new FuzzyDiffLine(FuzzyOperation.INSERT, text.AsMemory());
+        var diff = new FuzzyDiffLine(FuzzyOperation.INSERT, Utf16String.FromReference(text));
 
         Assert.Multiple(
             () =>
             {
-                Assert.That(diff.Operation,  Is.EqualTo(FuzzyOperation.INSERT));
+                Assert.That(diff.Operation, Is.EqualTo(FuzzyOperation.INSERT));
                 // Assert.That(diff.Text,       Is.EqualTo(text));
                 Assert.That(diff.ToString(), Is.EqualTo($"+{text}"));
             }
@@ -46,12 +47,12 @@ public static class DiffLineTests
     {
         const string text = "Test";
 
-        var diff = new FuzzyDiffLine(FuzzyOperation.EQUALS, text.AsMemory());
+        var diff = new FuzzyDiffLine(FuzzyOperation.EQUALS, Utf16String.FromReference(text));
 
         Assert.Multiple(
             () =>
             {
-                Assert.That(diff.Operation,  Is.EqualTo(FuzzyOperation.EQUALS));
+                Assert.That(diff.Operation, Is.EqualTo(FuzzyOperation.EQUALS));
                 // Assert.That(diff.Text,       Is.EqualTo(text));
                 Assert.That(diff.ToString(), Is.EqualTo($" {text}"));
             }
