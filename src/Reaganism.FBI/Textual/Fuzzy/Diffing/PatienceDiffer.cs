@@ -2,12 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using Reaganism.FBI.Textual.Fuzzy.Matching;
+using JetBrains.Annotations;
+
 using Reaganism.FBI.Utilities;
 
 namespace Reaganism.FBI.Textual.Fuzzy.Diffing;
 
-public static class PatienceDiffer
+[PublicAPI]
+public class PatienceDiffer(FuzzyTokenMapper? mapper = null) : IDiffer
 {
     private static class PatienceMatch
     {
@@ -193,41 +195,18 @@ public static class PatienceDiffer
         }
     }
 
-    public static int[] Match(
-        IReadOnlyCollection<Utf16String> originalLines,
-        IReadOnlyCollection<Utf16String> modifiedLines
-    )
-    {
-        return Match(new TokenMapper(), originalLines, modifiedLines);
-    }
+    [PublicAPI]
+    public FuzzyTokenMapper Mapper { get; } = mapper ?? new FuzzyTokenMapper();
 
-    internal static int[] Match(
-        TokenMapper                      mapper,
+    [PublicAPI]
+    public virtual int[] Match(
         IReadOnlyCollection<Utf16String> originalLines,
         IReadOnlyCollection<Utf16String> modifiedLines
     )
     {
-        var lineModeString1 = mapper.LinesToIds(originalLines);
-        var lineModeString2 = mapper.LinesToIds(modifiedLines);
+        var lineModeString1 = Mapper.LinesToIds(originalLines);
+        var lineModeString2 = Mapper.LinesToIds(modifiedLines);
 
         return PatienceMatch.Match(lineModeString1, lineModeString2, mapper.MaxLineId);
-    }
-}
-
-public static class LineMatchedDiffer
-{
-    public static int[] Match(
-        IReadOnlyCollection<Utf16String> originalLines,
-        IReadOnlyCollection<Utf16String> modifiedLines
-    )
-    {
-        var mapper         = new TokenMapper();
-        var matches        = PatienceDiffer.Match(mapper, originalLines, modifiedLines);
-        var wordModeLines1 = originalLines.Select(mapper.WordsToIds).ToArray();
-        var wordModeLines2 = modifiedLines.Select(mapper.WordsToIds).ToArray();
-
-        // TODO: Figure out how to make configurable.
-        new FuzzyLineMatcher().MatchLinesByWords(matches, wordModeLines1, wordModeLines2);
-        return matches;
     }
 }

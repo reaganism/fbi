@@ -237,6 +237,7 @@ public readonly unsafe struct Utf16String : IEquatable<Utf16String>
     }
 }
 
+[PublicAPI]
 public static class Utf16StringExtensions
 {
 #region StringBuilder extensions
@@ -256,6 +257,7 @@ public static class Utf16StringExtensions
     /// </summary>
     /// <param name="this">The <see cref="StringBuilder"/> to append to.</param>
     /// <param name="value">The <see cref="Utf16String"/> to append.</param>
+    [PublicAPI]
     public static StringBuilder AppendUtf16(
         this StringBuilder @this,
         Utf16String        value
@@ -272,6 +274,7 @@ public static class Utf16StringExtensions
     /// </summary>
     /// <param name="this">The <see cref="StringBuilder"/> to append to.</param>
     /// <param name="value">The <see cref="Utf16String"/> to append.</param>
+    [PublicAPI]
     public static StringBuilder AppendUtf16Line(
         this StringBuilder @this,
         Utf16String        value

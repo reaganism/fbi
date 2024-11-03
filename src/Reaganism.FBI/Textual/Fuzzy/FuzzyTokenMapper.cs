@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using JetBrains.Annotations;
+
 using Reaganism.FBI.Utilities;
 
 namespace Reaganism.FBI.Textual.Fuzzy;
@@ -9,10 +11,12 @@ namespace Reaganism.FBI.Textual.Fuzzy;
 /// <summary>
 ///     Maps words (tokens) to unique integer IDs; also handles entire lines.
 /// </summary>
-internal sealed class TokenMapper
+public sealed class FuzzyTokenMapper
 {
+    [PublicAPI]
     public int MaxLineId => idToLineCount;
 
+    [PublicAPI]
     public int MaxWordId => idToWord.Count;
 
     private readonly Dictionary<Utf16String, ushort> lineToId = [];
@@ -30,6 +34,7 @@ internal sealed class TokenMapper
     /// </summary>
     /// <param name="line">The line to add.</param>
     /// <returns>The unique ID for the line.</returns>
+    [PublicAPI]
     public ushort AddLine(Utf16String line)
     {
         if (lineToId.TryGetValue(line, out var id))
@@ -41,6 +46,7 @@ internal sealed class TokenMapper
         return id;
     }
 
+    [PublicAPI]
     public ushort AddWord(Utf16String word)
     {
         var span = word.Span;
@@ -62,6 +68,7 @@ internal sealed class TokenMapper
         return id;
     }
 
+    [PublicAPI]
     public Utf16String WordsToIds(Utf16String line)
     {
         if (wordsToIdsCache.TryGetValue(line, out var cached))
@@ -132,6 +139,7 @@ internal sealed class TokenMapper
     ///     Converts a collection of lines into a string of identifiers.
     /// </summary>
     /// <param name="lines">The collection of lines to convert.</param>
+    [PublicAPI]
     public ushort[] LinesToIds(IEnumerable<Utf16String> lines)
     {
         return lines.Select(AddLine).ToArray();
@@ -142,6 +150,7 @@ internal sealed class TokenMapper
     /// </summary>
     /// <param name="id">The identifier for the word.</param>
     /// <returns>The word associated with the identifier.</returns>
+    [PublicAPI]
     public Utf16String GetWord(ushort id)
     {
         return idToWord[id];
