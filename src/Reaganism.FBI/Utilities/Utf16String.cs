@@ -76,7 +76,8 @@ public readonly unsafe struct Utf16String : IEquatable<Utf16String>
         Debug.Assert(
             GetHashCode() == other.GetHashCode()
                 ? Span.SequenceEqual(other.Span)
-                : !Span.SequenceEqual(other.Span)
+                : !Span.SequenceEqual(other.Span),
+            $"Hash code collision; got 0x{GetHashCode():X8} for \"{Span.ToString()}\" and \"{other.Span.ToString()}\""
         );
         {
             return GetHashCode() == other.GetHashCode();
