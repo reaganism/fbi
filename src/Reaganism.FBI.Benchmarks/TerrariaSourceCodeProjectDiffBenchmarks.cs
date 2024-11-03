@@ -141,6 +141,10 @@ internal static class DiffHelper
             {
                 length--;
             }
+            else if (start + length > 2 && span[start + length - 2] == '\r' && span[start + length - 1] == '\n')
+            {
+                length -= 2;
+            }
 
             result.Add(text.Slice(start, length));
         }
