@@ -5,6 +5,8 @@ using System.Text;
 
 using JetBrains.Annotations;
 
+using Standart.Hash.xxHash;
+
 namespace Reaganism.FBI.Utilities;
 
 /// <summary>
@@ -48,12 +50,12 @@ public readonly unsafe struct Utf16String : IEquatable<Utf16String>
         Length   = len;
     }
 
+#region Hashing & equality
     public override int GetHashCode()
     {
-        return HashCode.Combine(unchecked((int)(long)ptr), Length);
+        return (int)xxHash32.ComputeHash(new ReadOnlySpan<byte>(ptr, Length * 2), Length * 2);
     }
 
-#region Hashing & equality
     [PublicAPI]
     public bool Equals(Utf16String other)
     {
