@@ -57,7 +57,7 @@ public sealed class FuzzyPatch
     [PublicAPI]
     public IReadOnlyCollection<string> ContextLines =>
         Diffs.Where(x => x.Operation != FuzzyOperation.INSERT)
-             .Select(x => x.ToString())
+             .Select(x => x.ToString(false))
              .ToList();
 
     /// <summary>
@@ -69,7 +69,7 @@ public sealed class FuzzyPatch
     [PublicAPI]
     public IReadOnlyCollection<string> PatchedLines =>
         Diffs.Where(x => x.Operation != FuzzyOperation.DELETE)
-             .Select(x => x.ToString())
+             .Select(x => x.ToString(false))
              .ToList();
 
     /// <summary>
@@ -106,6 +106,15 @@ public sealed class FuzzyPatch
     public FuzzyPatch(List<FuzzyDiffLine>? diffs = null)
     {
         Diffs = diffs ?? [];
+    }
+
+    public FuzzyPatch(FuzzyPatch patch)
+    {
+        Diffs   = patch.Diffs;
+        Start1  = patch.Start1;
+        Start2  = patch.Start2;
+        Length1 = patch.Length1;
+        Length2 = patch.Length2;
     }
 
     /// <summary>

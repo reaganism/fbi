@@ -26,7 +26,6 @@
 
     <ItemGroup>
         <Folder Include="Binary\"/>
-        <Folder Include="Textual\Fuzzy\Patching\"/>
     </ItemGroup>
 
 </Project>

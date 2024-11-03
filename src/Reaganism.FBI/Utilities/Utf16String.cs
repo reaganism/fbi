@@ -5,6 +5,8 @@ using System.Text;
 
 using JetBrains.Annotations;
 
+using Reaganism.FBI.Utilities.Buffers;
+
 using Standart.Hash.xxHash;
 
 namespace Reaganism.FBI.Utilities;
@@ -26,34 +28,43 @@ public readonly unsafe struct Utf16String : IEquatable<Utf16String>
     ///     A <see cref="ReadOnlySpan{T}"/> view into the underlying data.
     /// </summary>
     [PublicAPI]
-    public ReadOnlySpan<char> Span => new(ptr, Length);
+    public ReadOnlySpan<char> Span => mem.Span;
 
     /// <summary>
     ///     A <see langword="ref"/> <see cref="char"/> to the first element of
     ///     the underlying data.
     /// </summary>
     [PublicAPI]
-    public ref char Ref => ref *ptr;
+    public ref char Ref => ref *Ptr;
+
+    private char* Ptr
+    {
+        get
+        {
+            fixed (char* p = mem.Span)
+            {
+                return p;
+            }
+        }
+    }
 
     /// <summary>
-    ///     The length of the <see cref="Utf16String"/>.  Equivalent to
-    ///     <see cref="Span{T}.Length"/>.
+    ///     The length of the <see cref="Utf16String"/>.
     /// </summary>
     [PublicAPI]
-    public int Length { get; }
+    public int Length => mem.Length;
 
-    private readonly char* ptr;
+    private readonly ReadOnlyMemory<char> mem;
 
-    private Utf16String(char* ptr, int len)
+    private Utf16String(ReadOnlyMemory<char> mem)
     {
-        this.ptr = ptr;
-        Length   = len;
+        this.mem = mem;
     }
 
 #region Hashing & equality
     public override int GetHashCode()
     {
-        return (int)xxHash32.ComputeHash(new ReadOnlySpan<byte>(ptr, Length * 2), Length * 2);
+        return (int)xxHash32.ComputeHash(new ReadOnlySpan<byte>(Ptr, Length * 2), Length * 2);
     }
 
     [PublicAPI]
@@ -64,7 +75,7 @@ public readonly unsafe struct Utf16String : IEquatable<Utf16String>
             return false;
         }
 
-        if (ptr == other.ptr)
+        if (Ptr == other.Ptr)
         {
             // We already check that the lengths match first.
             return true;
@@ -106,7 +117,7 @@ public readonly unsafe struct Utf16String : IEquatable<Utf16String>
         Debug.Assert(start  >= 0 && start          <= Length);
         Debug.Assert(length >= 0 && start + length <= Length);
 
-        return new Utf16String(ptr + start, length);
+        return new Utf16String(mem.Slice(start, length));
     }
 
     /// <summary>
@@ -126,6 +137,18 @@ public readonly unsafe struct Utf16String : IEquatable<Utf16String>
     }
 
     /// <summary>
+    ///     Creates a <see cref="Utf16String"/> from a <see cref="string"/>
+    ///     without copying the data.
+    /// </summary>
+    /// <param name="value">The <see cref="string"/>.</param>
+    /// <returns>The <see cref="Utf16String"/>.</returns>
+    [PublicAPI]
+    public static Utf16String FromString(string value)
+    {
+        return new Utf16String(value.AsMemory());
+    }
+
+    /// <summary>
     ///     Creates a <see cref="Utf16String"/> from a <see cref="Span{T}"/>
     ///     without copying the data.
     /// </summary>
@@ -134,10 +157,8 @@ public readonly unsafe struct Utf16String : IEquatable<Utf16String>
     [PublicAPI]
     public static Utf16String FromSpan(Span<char> value)
     {
-        fixed (char* pValue = value)
-        {
-            return new Utf16String(pValue, value.Length);
-        }
+        var mem = new UnmanagedMemoryManager<char>(value);
+        return new Utf16String(mem.Memory);
     }
 
     /// <summary>
@@ -149,10 +170,8 @@ public readonly unsafe struct Utf16String : IEquatable<Utf16String>
     [PublicAPI]
     public static Utf16String FromSpan(ReadOnlySpan<char> value)
     {
-        fixed (char* pValue = value)
-        {
-            return new Utf16String(pValue, value.Length);
-        }
+        var mem = new UnmanagedMemoryManager<char>(value);
+        return new Utf16String(mem.Memory);
     }
 
     [PublicAPI]

@@ -135,6 +135,11 @@ public sealed class FuzzyTokenMapper
         return wordsToIdsCache[line] = new string(buf, 0, bufLength);
     }
 
+    public string WordsToIds(string line)
+    {
+        return WordsToIds(Utf16String.FromString(line));
+    }
+
     /// <summary>
     ///     Converts a collection of lines into a string of identifiers.
     /// </summary>
@@ -143,6 +148,16 @@ public sealed class FuzzyTokenMapper
     public ushort[] LinesToIds(IEnumerable<Utf16String> lines)
     {
         return lines.Select(AddLine).ToArray();
+    }
+
+    /// <summary>
+    ///     Converts a collection of lines into a string of identifiers.
+    /// </summary>
+    /// <param name="lines">The collection of lines to convert.</param>
+    [PublicAPI]
+    public ushort[] LinesToIds(IEnumerable<string> lines)
+    {
+        return lines.Select(x => AddLine(Utf16String.FromString(x))).ToArray();
     }
 
     /// <summary>

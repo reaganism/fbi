@@ -91,9 +91,19 @@ public readonly struct FuzzyDiffLine
 
     // PERF: Avoid using ToString when possible.  Prefer Append[Line] APIs when
     //       concatenating strings.
+    public string ToString(bool withPrefix)
+    {
+        if (withPrefix)
+        {
+            return hasPrefix ? text.Span.ToString() : Operation.LinePrefix + text.Span.ToString();
+        }
+
+        return hasPrefix ? text.Span[1..].ToString() : text.Span.ToString();
+    }
+
     public override string ToString()
     {
-        return hasPrefix ? text.Span.ToString() : Operation.LinePrefix + text.Span.ToString();
+        return ToString(true);
     }
 #endregion
 }
