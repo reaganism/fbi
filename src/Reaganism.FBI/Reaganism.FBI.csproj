@@ -21,6 +21,7 @@
         <PackageReference Include="Roslynator.Analyzers" Version="4.12.4" PrivateAssets="all">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
+        <PackageReference Include="Standart.Hash.xxHash" Version="4.0.5"/>
     </ItemGroup>
 
     <ItemGroup>
@@ -28,9 +29,9 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Binary\" />
-      <Folder Include="Textual\Fuzzy\Diffing\" />
-      <Folder Include="Textual\Fuzzy\Patching\" />
+        <Folder Include="Binary\"/>
+        <Folder Include="Textual\Fuzzy\Diffing\"/>
+        <Folder Include="Textual\Fuzzy\Patching\"/>
     </ItemGroup>
 
 </Project>

@@ -1,7 +1,10 @@
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 using JetBrains.Annotations;
+
+using Standart.Hash.xxHash;
 
 namespace Reaganism.FBI.Utility;
 
@@ -16,7 +19,7 @@ namespace Reaganism.FBI.Utility;
 ///     benefit of stack allocations.
 /// </remarks>
 [PublicAPI]
-public readonly unsafe struct Utf16String
+public readonly unsafe struct Utf16String : IEquatable<Utf16String>
 {
     /// <summary>
     ///     A <see cref="ReadOnlySpan{T}"/> view into the underlying data.
@@ -45,6 +48,45 @@ public readonly unsafe struct Utf16String
         this.ptr = ptr;
         Length   = len;
     }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(unchecked((int)(long)ptr), Length);
+    }
+
+#region Hashing & equality
+    [PublicAPI]
+    public bool Equals(Utf16String other)
+    {
+        if (Length != other.Length)
+        {
+            return false;
+        }
+
+        if (ptr == other.ptr)
+        {
+            // We already check that the lengths match first.
+            return true;
+        }
+
+        // Lazily check equality with the hash code (collision is possible but
+        // unlikely and implies other issues).  We can check the equality of the
+        // sequence while debugging to make sure, though.
+        Debug.Assert(
+            GetHashCode() == other.GetHashCode()
+                ? Span.SequenceEqual(other.Span)
+                : !Span.SequenceEqual(other.Span)
+        );
+        {
+            return GetHashCode() == other.GetHashCode();
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is Utf16String other && Equals(other);
+    }
+#endregion
 
     /// <summary>
     ///     Slices the <see cref="Utf16String"/> to the specified range without
@@ -124,5 +166,17 @@ public readonly unsafe struct Utf16String
         {
             return new Utf16String(pValue, value.Length);
         }
+    }
+
+    [PublicAPI]
+    public static bool operator ==(Utf16String left, Utf16String right)
+    {
+        return left.Equals(right);
+    }
+
+    [PublicAPI]
+    public static bool operator !=(Utf16String left, Utf16String right)
+    {
+        return !(left == right);
     }
 }
