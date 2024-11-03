@@ -4,7 +4,7 @@ using System.Linq;
 
 using JetBrains.Annotations;
 
-using Reaganism.FBI.Utility;
+using Reaganism.FBI.Utilities;
 
 namespace Reaganism.FBI.Textual.Fuzzy;
 

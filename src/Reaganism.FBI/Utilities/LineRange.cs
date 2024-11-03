@@ -7,7 +7,7 @@ using System.Runtime.CompilerServices;
 
 using JetBrains.Annotations;
 
-namespace Reaganism.FBI.Utility;
+namespace Reaganism.FBI.Utilities;
 
 /// <summary>
 ///     Describes an inclusive-exclusive range of lines.

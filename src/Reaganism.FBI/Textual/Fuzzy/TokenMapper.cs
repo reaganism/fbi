@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using Reaganism.FBI.Utility;
+using Reaganism.FBI.Utilities;
 
 namespace Reaganism.FBI.Textual.Fuzzy;
 

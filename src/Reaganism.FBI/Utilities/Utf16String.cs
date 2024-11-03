@@ -1,12 +1,9 @@
 using System;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 
 using JetBrains.Annotations;
 
-using Standart.Hash.xxHash;
-
-namespace Reaganism.FBI.Utility;
+namespace Reaganism.FBI.Utilities;
 
 /// <summary>
 ///     A UTF-16-encoded string.

@@ -31,6 +31,7 @@
     <ItemGroup>
         <Folder Include="Binary\"/>
         <Folder Include="Textual\Fuzzy\Diffing\"/>
+        <Folder Include="Textual\Fuzzy\Matching\" />
         <Folder Include="Textual\Fuzzy\Patching\"/>
     </ItemGroup>
 

@@ -1,5 +1,5 @@
 using Reaganism.FBI.Textual.Fuzzy;
-using Reaganism.FBI.Utility;
+using Reaganism.FBI.Utilities;
 
 namespace Reaganism.FBI.Tests;
 

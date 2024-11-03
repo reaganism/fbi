@@ -1,7 +1,7 @@
 using System.Runtime.CompilerServices;
 using System.Text;
 
-namespace Reaganism.FBI.Utility;
+namespace Reaganism.FBI.Utilities;
 
 internal static class StringBuilderExtensions
 {
