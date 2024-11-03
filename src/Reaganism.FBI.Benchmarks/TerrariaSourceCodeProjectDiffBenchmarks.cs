@@ -61,12 +61,9 @@ internal static class DiffHelper
     private static unsafe void DiffFileFbi(DifferSettings settings, string relativePath)
     {
         // Is this size excessive?
-        const long max_file_bytes_for_stack = 1024 * 5;
+        const long max_file_bytes_for_stack = 1024 * 100;
 
-        var refOriginalText = "";
-        var refModifiedText = "";
-
-        var originalText = default(Utf16String?);
+        Utf16String originalText;
         {
             var originalPath = Path.Combine(settings.OriginalDirectory, relativePath).Replace('\\', '/');
             var originalInfo = new FileInfo(originalPath);
@@ -83,11 +80,11 @@ internal static class DiffHelper
             }
             else
             {
-                refOriginalText = File.ReadAllText(originalPath);
+                originalText = Utf16String.FromString(File.ReadAllText(originalPath));
             }
         }
 
-        var modifiedText = default(Utf16String?);
+        Utf16String modifiedText;
         {
             var modifiedPath = Path.Combine(settings.ModifiedDirectory, relativePath).Replace('\\', '/');
             var modifiedInfo = new FileInfo(modifiedPath);
@@ -104,54 +101,51 @@ internal static class DiffHelper
             }
             else
             {
-                refModifiedText = File.ReadAllText(modifiedPath);
+                modifiedText = Utf16String.FromString(File.ReadAllText(modifiedPath));
             }
         }
 
-        fixed (char* pOriginalText = refOriginalText)
-        {
-            fixed (char* pModifiedText = refModifiedText)
-            {
-                originalText ??= Utf16String.FromSpan(new Span<char>(pOriginalText, refOriginalText.Length));
-                modifiedText ??= Utf16String.FromSpan(new Span<char>(pModifiedText, refModifiedText.Length));
-
-                _ = FuzzyDiffer.DiffTexts(
-                    new LineMatchedDiffer(),
-                    SplitText(originalText.Value),
-                    SplitText(modifiedText.Value)
-                );
-            }
-        }
+        _ = FuzzyDiffer.DiffTexts(
+            new LineMatchedDiffer(),
+            SplitText(originalText),
+            SplitText(modifiedText)
+        );
     }
 
-    private static IReadOnlyList<Utf16String> SplitText(Utf16String text)
+    private static unsafe List<Utf16String> SplitText(Utf16String text)
     {
         var span = text.Span;
 
-        var lines = new List<Utf16String>();
-
-        var start = 0;
+        var lineCount = 0;
         for (var i = 0; i < text.Length; i++)
         {
             if (span[i] == '\n')
             {
-                lines.Add(text.Slice(start, i - start));
-                start = i + 1;
-            }
-            else if (span[i] == '\r' && i + 1 < span.Length && span[i + 1] == '\n')
-            {
-                lines.Add(text.Slice(start, i - start));
-                start = i + 2;
-                i++;
+                lineCount++;
             }
         }
 
-        if (start < text.Length)
+        var ranges = (Span<Range>)stackalloc Range[lineCount];
+        if (span.Split(ranges, '\n') != ranges.Length)
         {
-            lines.Add(text.Slice(start, text.Length - start));
+            throw new Exception("Line count mismatch");
         }
 
-        return lines;
+        var result = new List<Utf16String>(ranges.Length);
+
+        for (var i = 0; i < ranges.Length; i++)
+        {
+            var (start, length) = ranges[i].GetOffsetAndLength(text.Length);
+
+            if (span[start + length - 1] == '\r')
+            {
+                length--;
+            }
+
+            result.Add(text.Slice(start, length));
+        }
+
+        return result;
     }
 
     private static void DiffFileCodeChicken(DifferSettings settings, string relativePath)
