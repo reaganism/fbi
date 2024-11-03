@@ -100,7 +100,7 @@ public readonly unsafe struct Utf16String : IEquatable<Utf16String>
     [PublicAPI]
     public Utf16String Slice(int start, int length)
     {
-        Debug.Assert(start  > 0  && start          <= Length);
+        Debug.Assert(start  >= 0 && start          <= Length);
         Debug.Assert(length >= 0 && start + length <= Length);
 
         return new Utf16String(ptr + start, length);
