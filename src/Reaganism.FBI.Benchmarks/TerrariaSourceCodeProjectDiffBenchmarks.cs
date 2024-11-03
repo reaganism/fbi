@@ -120,23 +120,24 @@ internal static class DiffHelper
         var start = 0;
         for (var i = 0; i < text.Length; i++)
         {
-            if (span[i] == '\r' || span[i] == '\n')
+            if (span[i] == '\n')
             {
-                lines.Add(text[start..i]);
+                lines.Add(text.Slice(start, i - start));
                 start = i + 1;
-
-                if (span[i] == '\r' && i + 1 < text.Length && span[i + 1] == '\n')
-                {
-                    i++;
-                }
+            }
+            else if (span[i] == '\r' && i + 1 < span.Length && span[i + 1] == '\n')
+            {
+                lines.Add(text.Slice(start, i - start));
+                start = i + 2;
+                i++;
             }
         }
 
         if (start < text.Length)
         {
-            lines.Add(text[start..]);
+            lines.Add(text.Slice(start, text.Length - start));
         }
-
+        
         return lines;
     }
 
