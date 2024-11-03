@@ -2,29 +2,27 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using JetBrains.Annotations;
+using Reaganism.FBI.Utilities;
 
-using Reaganism.FBI.Diffing;
-using Reaganism.FBI.Utilities.Extensions;
+namespace Reaganism.FBI.Textual.Fuzzy.Matching;
 
-namespace Reaganism.FBI.Matching;
+// TODO: Heavily optimize after rewrite.
 
-[PublicAPI]
-public sealed class FuzzyLineMatcher
+internal sealed class FuzzyLineMatcher
 {
-    [PublicAPI]
     public const float DEFAULT_MIN_MATCH_SCORE = 0.5f;
 
-    [PublicAPI]
-    public int MaxMatchOffset { [PublicAPI] get; [PublicAPI] set; } = MatchMatrix.DEFAULT_MAX_OFFSET;
+    public int MaxMatchOffset { get; set; } = FuzzyMatchMatrix.DEFAULT_MAX_OFFSET;
 
-    [PublicAPI]
-    public float MinMatchScore { [PublicAPI] get; [PublicAPI] set; } = DEFAULT_MIN_MATCH_SCORE;
+    public float MinMatchScore { get; set; } = DEFAULT_MIN_MATCH_SCORE;
 
-    [PublicAPI]
-    public void MatchLinesByWords(int[] matches, IReadOnlyList<string> wmLines1, IReadOnlyList<string> wmLines2)
+    public void MatchLinesByWords(
+        int[]                 matches,
+        IReadOnlyList<string> wmLines1,
+        IReadOnlyList<string> wmLines2
+    )
     {
-        foreach (var (range1, range2) in LineMatching.UnmatchedRanges(matches, wmLines2.Count))
+        foreach (var (range1, range2) in FuzzyLineMatching.UnmatchedRanges(matches, wmLines2.Count))
         {
             if (range1.Length == 0 || range2.Length == 0)
             {
@@ -42,8 +40,10 @@ public sealed class FuzzyLineMatcher
         }
     }
 
-    [PublicAPI]
-    public int[] Match(IReadOnlyList<string> pattern, IReadOnlyList<string> search)
+    public int[] Match(
+        IReadOnlyList<string> pattern,
+        IReadOnlyList<string> search
+    )
     {
         if (search.Count < pattern.Count)
         {
@@ -74,7 +74,7 @@ public sealed class FuzzyLineMatcher
         var bestScore = MinMatchScore;
         var bestMatch = default(int[]);
 
-        var mm = new MatchMatrix(pattern, search, MaxMatchOffset);
+        var mm = new FuzzyMatchMatrix(pattern, search, MaxMatchOffset);
         for (var i = mm.WorkingRange.First; mm.Match(i, out var score); i++)
         {
             if (score <= bestScore)
@@ -90,13 +90,12 @@ public sealed class FuzzyLineMatcher
     }
 
     // Assumes the lines are in word-to-char mode.
-    [PublicAPI]
     public static float MatchLines(string s, string t)
     {
         var d = LevenshteinDistance(s, t);
         if (d == 0)
         {
-            // Perfect match.
+            // Perfect match!
             return 1f;
         }
 
@@ -104,7 +103,7 @@ public sealed class FuzzyLineMatcher
         return Math.Max(0f, 1f - (d / max));
     }
 
-    private static int LevenshteinDistance(string s, string t)
+    internal static int LevenshteinDistance(string s, string t)
     {
         // Degenerate cases.
         if (s == t)
@@ -123,8 +122,8 @@ public sealed class FuzzyLineMatcher
         }
 
         // Create two work vectors of integer distances.
-        var v0 = new int[t.Length + 1]; // Previous
-        var v1 = new int[t.Length + 1]; // Current
+        var v0 = (Span<int>)stackalloc int[t.Length + 1]; // Previous
+        var v1 = (Span<int>)stackalloc int[t.Length + 1]; // Current
 
         // Initialize v1 (the current row of distances).  This row is
         // A[0][i]: edit distance for an empty `s`.  The distance is just
@@ -137,7 +136,9 @@ public sealed class FuzzyLineMatcher
         for (var i = 0; i < s.Length; i++)
         {
             // Swap v1 to v0, reuse old v0 as new v1.
-            (v0, v1) = (v1, v0);
+            var temp = v0;
+            v0 = v1;
+            v1 = temp;
 
             // Calculate v1 (current row distances) from the previous row
             // v0.

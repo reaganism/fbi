@@ -1,14 +1,18 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
-using JetBrains.Annotations;
+using Reaganism.FBI.Utilities;
 
-namespace Reaganism.FBI.Matching;
+namespace Reaganism.FBI.Textual.Fuzzy.Matching;
 
-[PublicAPI]
-public sealed class MatchMatrix
+// TODO: Heavily optimize after rewrite.
+//       - Can MatchNode be a struct?
+//       - Convert to stack allocations where possible.
+//       - Attempt aggressive algorith optimizations; remove branching?
+
+internal sealed class FuzzyMatchMatrix
 {
-    private sealed class MatchNodes
+    private sealed class MatchNode
     {
         /// <summary>
         ///     The score of the match.
@@ -35,24 +39,28 @@ public sealed class MatchMatrix
     /// </summary>
     private sealed class StraightMatch
     {
-        public MatchNodes[] Nodes { get; }
+        public MatchNode[] Nodes { get; }
 
         private readonly int                   patternLength;
         private readonly IReadOnlyList<string> pattern;
         private readonly IReadOnlyList<string> search;
         private readonly LineRange             range;
 
-        public StraightMatch(IReadOnlyList<string> pattern, IReadOnlyList<string> search, LineRange range)
+        public StraightMatch(
+            IReadOnlyList<string> pattern,
+            IReadOnlyList<string> search,
+            LineRange             range
+        )
         {
             patternLength = pattern.Count;
             this.pattern  = pattern;
             this.search   = search;
             this.range    = range;
 
-            Nodes = new MatchNodes[patternLength];
+            Nodes = new MatchNode[patternLength];
             for (var i = 0; i < patternLength; i++)
             {
-                Nodes[i] = new MatchNodes();
+                Nodes[i] = new MatchNode();
             }
         }
 
@@ -73,11 +81,9 @@ public sealed class MatchMatrix
         }
     }
 
-    [PublicAPI]
     public const int DEFAULT_MAX_OFFSET = 5;
 
-    [PublicAPI]
-    public LineRange WorkingRange { [PublicAPI] get; }
+    public LineRange WorkingRange { get; }
 
     private readonly int       patternLength;
     private readonly LineRange range;
@@ -89,46 +95,41 @@ public sealed class MatchMatrix
 
     /// <summary>
     ///     Consecutive matches for pattern offset from loc by up to
-    ///     <see cref="maxOffset"/>. First entry is for pattern starting at
-    ///     loc in text, last entry is <c>offset</c> +
+    ///     <see cref="maxOffset"/>.  The first entry is for pattern starting at
+    ///     loc in text, the last entry is <c>offset</c> +
     ///     <see cref="maxOffset"/>.
     /// </summary>
     private readonly StraightMatch[] matches;
 
     /// <summary>
-    ///     Location of first pattern line in search lines. Starting offset
+    ///     Location of first pattern line in search lines.  Starting offset
     ///     for a match.
     /// </summary>
     private int pos = int.MaxValue;
 
     private int firstNode;
 
-    [PublicAPI]
-    public MatchMatrix(
+    public FuzzyMatchMatrix(
         IReadOnlyList<string> pattern,
         IReadOnlyList<string> search,
         int                   maxOffset = DEFAULT_MAX_OFFSET,
-        LineRange             range     = default
+        LineRange?            range     = null
     )
     {
-        if (range == default(LineRange))
-        {
-            range = new LineRange().WithLength(search.Count);
-        }
+        range ??= new LineRange().WithLength(search.Count);
 
         patternLength  = pattern.Count;
-        this.range     = range;
+        this.range     = range.Value;
         this.maxOffset = maxOffset;
-        WorkingRange   = new LineRange(range.Start - maxOffset, 0).WithLast(range.End - patternLength);
+        WorkingRange   = new LineRange(this.range.Start - maxOffset, 0).WithLast(this.range.End - patternLength);
 
         matches = new StraightMatch[maxOffset + 1];
         for (var i = 0; i <= maxOffset; i++)
         {
-            matches[i] = new StraightMatch(pattern, search, range);
+            matches[i] = new StraightMatch(pattern, search, this.range);
         }
     }
 
-    [PublicAPI]
     public bool Match(int loc, out float score)
     {
         score = 0f;
@@ -194,7 +195,7 @@ public sealed class MatchMatrix
     }
 
     /// <summary>
-    ///     Calculates the best path through the match matrix. All paths
+    ///     Calculates the best path through the match matrix.  All paths
     ///     must start with the first line of pattern matched to the line at
     ///     loc (0 offset).
     /// </summary>
@@ -270,7 +271,6 @@ public sealed class MatchMatrix
     ///     An array of corresponding line numbers in search text for each
     ///     line in the pattern.
     /// </returns>
-    [PublicAPI]
     public int[] Path()
     {
         var path = new int[patternLength];

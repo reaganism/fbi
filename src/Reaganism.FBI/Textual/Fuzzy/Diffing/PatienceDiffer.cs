@@ -4,10 +4,12 @@ using System.Linq;
 
 using JetBrains.Annotations;
 
-namespace Reaganism.FBI.Diffing;
+using Reaganism.FBI.Utilities;
+
+namespace Reaganism.FBI.Textual.Fuzzy.Diffing;
 
 [PublicAPI]
-public class PatienceDiffer(TokenMapper? tokenMapper = null) : IDiffer
+public class PatienceDiffer(FuzzyTokenMapper? mapper = null) : IDiffer
 {
     private static class PatienceMatch
     {
@@ -18,10 +20,10 @@ public class PatienceDiffer(TokenMapper? tokenMapper = null) : IDiffer
             public LcaNode? Previous { get; } = previous;
         }
 
-        public static unsafe int[] Match(string originalChars, string modifiedChars, int maxChar)
+        public static unsafe int[] Match(ushort[] originalChars, ushort[] modifiedChars, int maxChar)
         {
-            Span<int> unique1 = stackalloc int[maxChar];
-            Span<int> unique2 = stackalloc int[maxChar];
+            var unique1 = (Span<int>)stackalloc int[maxChar];
+            var unique2 = (Span<int>)stackalloc int[maxChar];
 
             for (var i = 0; i < maxChar; i++)
             {
@@ -31,7 +33,7 @@ public class PatienceDiffer(TokenMapper? tokenMapper = null) : IDiffer
             return Match(unique1, unique2, originalChars, modifiedChars);
         }
 
-        private static int[] Match(Span<int> unique1, Span<int> unique2, string chars1, string chars2)
+        private static int[] Match(Span<int> unique1, Span<int> unique2, ushort[] chars1, ushort[] chars2)
         {
             var matches = new int[chars1.Length];
             for (var i = 0; i < chars1.Length; i++)
@@ -43,7 +45,7 @@ public class PatienceDiffer(TokenMapper? tokenMapper = null) : IDiffer
             return matches;
         }
 
-        private static void Match(int start1, int end1, int start2, int end2, Span<int> unique1, Span<int> unique2, string chars1, string chars2, int[] matches)
+        private static void Match(int start1, int end1, int start2, int end2, Span<int> unique1, Span<int> unique2, ushort[] chars1, ushort[] chars2, int[] matches)
         {
             // Step 1: Match up identical starting lines.
             while (start1 < end1 && start2 < end2 && chars1[start1] == chars2[start2])
@@ -86,7 +88,7 @@ public class PatienceDiffer(TokenMapper? tokenMapper = null) : IDiffer
             }
         }
 
-        private static IEnumerable<(int, int)> LcsUnique(int start1, int end1, int start2, int end2, Span<int> unique1, Span<int> unique2, string chars1, string chars2)
+        private static IEnumerable<(int, int)> LcsUnique(int start1, int end1, int start2, int end2, Span<int> unique1, Span<int> unique2, ushort[] chars1, ushort[] chars2)
         {
             var subChars = new List<int>();
 
@@ -194,14 +196,17 @@ public class PatienceDiffer(TokenMapper? tokenMapper = null) : IDiffer
     }
 
     [PublicAPI]
-    public TokenMapper TokenMapper { [PublicAPI] get; } = tokenMapper ?? new TokenMapper();
+    public FuzzyTokenMapper Mapper { get; } = mapper ?? new FuzzyTokenMapper();
 
     [PublicAPI]
-    public virtual int[] Match(IReadOnlyCollection<string> originalLines, IReadOnlyCollection<string> modifiedLines)
+    public virtual int[] Match(
+        IReadOnlyCollection<Utf16String> originalLines,
+        IReadOnlyCollection<Utf16String> modifiedLines
+    )
     {
-        var lineModeString1 = TokenMapper.LinesToIds(originalLines);
-        var lineModeString2 = TokenMapper.LinesToIds(modifiedLines);
+        var lineModeString1 = Mapper.LinesToIds(originalLines);
+        var lineModeString2 = Mapper.LinesToIds(modifiedLines);
 
-        return PatienceMatch.Match(lineModeString1, lineModeString2, TokenMapper.MaxLineId);
+        return PatienceMatch.Match(lineModeString1, lineModeString2, Mapper.MaxLineId);
     }
 }

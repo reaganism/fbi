@@ -1,10 +1,13 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 
-namespace Reaganism.FBI.Matching;
+using Reaganism.FBI.Utilities;
 
-internal static class LineMatching
+namespace Reaganism.FBI.Textual.Fuzzy.Matching;
+
+// TODO: Heavily optimize after rewrite.
+
+internal static class FuzzyLineMatching
 {
     public static IEnumerable<(LineRange, LineRange)> UnmatchedRanges(int[] matches, int len2)
     {
@@ -38,7 +41,9 @@ internal static class LineMatching
         while (start1 < len1 || start2 < len2);
     }
 
-    private static IEnumerable<(LineRange, LineRange)> UnmatchedRanges(IEnumerable<Patch> patches)
+    private static IEnumerable<(LineRange, LineRange)> UnmatchedRanges(
+        IEnumerable<FuzzyPatch> patches
+    )
     {
         foreach (var patch in patches)
         {
@@ -49,7 +54,7 @@ internal static class LineMatching
             for (var i = 0; i < diffs.Count;)
             {
                 // Skip matched.
-                while (i < diffs.Count && diffs[i].Operation == Operation.EQUALS)
+                while (i < diffs.Count && diffs[i].Operation == FuzzyOperation.EQUALS)
                 {
                     start1++;
                     start2++;
@@ -58,9 +63,9 @@ internal static class LineMatching
 
                 var end1 = start1;
                 var end2 = start2;
-                while (i < diffs.Count && diffs[i].Operation != Operation.EQUALS)
+                while (i < diffs.Count && diffs[i].Operation != FuzzyOperation.EQUALS)
                 {
-                    if (diffs[i++].Operation == Operation.DELETE)
+                    if (diffs[i++].Operation == FuzzyOperation.DELETE)
                     {
                         end1++;
                     }
@@ -81,7 +86,10 @@ internal static class LineMatching
         }
     }
 
-    private static int[] FromUnmatchedRanges(IEnumerable<(LineRange, LineRange)> unmatchedRanges, int len1)
+    private static int[] FromUnmatchedRanges(
+        IEnumerable<(LineRange, LineRange)> unmatchedRanges,
+        int                                 len1
+    )
     {
         var matches = new int[len1];
         var start1  = 0;
@@ -115,14 +123,18 @@ internal static class LineMatching
         return matches;
     }
 
-    public static int[] FromPatches(IEnumerable<Patch> patches, int len1)
+    public static int[] FromPatches(IEnumerable<FuzzyPatch> patches, int len1)
     {
         return FromUnmatchedRanges(UnmatchedRanges(patches), len1);
     }
 
-    public static List<DiffLine> MakeDiffList(int[] matches, IReadOnlyList<string> lines1, IReadOnlyList<string> lines2)
+    public static List<FuzzyDiffLine> MakeDiffList(
+        int[]                      matches,
+        IReadOnlyList<Utf16String> lines1,
+        IReadOnlyList<Utf16String> lines2
+    )
     {
-        var list = new List<DiffLine>(Math.Max(Math.Max(matches.Length, lines1.Count), lines2.Count));
+        var list = new List<FuzzyDiffLine>(Math.Max(Math.Max(matches.Length, lines1.Count), lines2.Count));
 
         var l = 0;
         var r = 0;
@@ -135,22 +147,22 @@ internal static class LineMatching
 
             while (l < i)
             {
-                list.Add(new DiffLine(Operation.DELETE, lines1[l++]));
+                list.Add(new FuzzyDiffLine(FuzzyOperation.DELETE, lines1[l++]));
             }
 
             while (r < matches[i])
             {
-                list.Add(new DiffLine(Operation.INSERT, lines2[r++]));
+                list.Add(new FuzzyDiffLine(FuzzyOperation.INSERT, lines2[r++]));
             }
 
             if (lines1[l] != lines2[r])
             {
-                list.Add(new DiffLine(Operation.DELETE, lines1[l]));
-                list.Add(new DiffLine(Operation.INSERT, lines2[r]));
+                list.Add(new FuzzyDiffLine(FuzzyOperation.DELETE, lines1[l]));
+                list.Add(new FuzzyDiffLine(FuzzyOperation.INSERT, lines2[r]));
             }
             else
             {
-                list.Add(new DiffLine(Operation.EQUALS, lines1[l]));
+                list.Add(new FuzzyDiffLine(FuzzyOperation.EQUALS, lines1[l]));
             }
 
             l++;
@@ -159,12 +171,12 @@ internal static class LineMatching
 
         while (l < lines1.Count)
         {
-            list.Add(new DiffLine(Operation.DELETE, lines1[l++]));
+            list.Add(new FuzzyDiffLine(FuzzyOperation.DELETE, lines1[l++]));
         }
 
         while (r < lines2.Count)
         {
-            list.Add(new DiffLine(Operation.INSERT, lines2[r++]));
+            list.Add(new FuzzyDiffLine(FuzzyOperation.INSERT, lines2[r++]));
         }
 
         return list;
