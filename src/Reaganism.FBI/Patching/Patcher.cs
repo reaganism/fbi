@@ -524,7 +524,7 @@ public sealed class Patcher
         // incurring some wasted allocation and setup time, but it reads easier
         // than trying to precompute all the edge cases.
         var fwdMatchers = ranges.Select(x => new MatchMatrix(wmPattern,           wmText, options.MaxMatchOffset, x)).SkipWhile(x => loc > x.WorkingRange.Last).ToArray();
-        var revMatches  = ranges.Reverse().Select(x => new MatchMatrix(wmPattern, wmText, options.MaxMatchOffset, x)).SkipWhile(x => loc < x.WorkingRange.First).ToArray();
+        var revMatches  = ranges.AsEnumerable().Reverse().Select(x => new MatchMatrix(wmPattern, wmText, options.MaxMatchOffset, x)).SkipWhile(x => loc < x.WorkingRange.First).ToArray();
 
         var warnDist       = OffsetWarnDistance(wmPattern.Count, wmText.Count);
         var penaltyPerLine = options.EnableDistancePenalty ? 1f / (10 * warnDist) : 0;
